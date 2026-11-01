@@ -1,0 +1,74 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  test:
+    if: github.ref == 'refs/heads/main'
+    uses: ./.github/workflows/ci.yml
+
+  release:
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    outputs:
+      created: ${{ steps.release.outputs.release_created }}
+      tag: ${{ steps.release.outputs.tag_name }}
+    steps:
+      - uses: googleapis/release-please-action@8b8fd2cc23b2e18957157a9d923d75aa0c6f6ad5 # v4
+        id: release
+        with:
+          token: ${{ secrets.RELEASE_PLEASE_TOKEN || github.token }}
+          target-branch: main
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+
+  publish:
+    needs: release
+    if: needs.release.outputs.created == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6
+        with:
+          go-version: stable
+          cache: false
+      # Keep this in the same workflow: tags created with GITHUB_TOKEN do not
+      # trigger another workflow. Resolve outside a module to query the proxy.
+      - name: Publish and verify Go module
+        working-directory: ${{ runner.temp }}
+        env:
+          RELEASE_TAG: ${{ needs.release.outputs.tag }}
+          GOPROXY: https://proxy.golang.org
+          GOPRIVATE: ""
+          GONOPROXY: ""
+          GONOSUMDB: ""
+          GOSUMDB: sum.golang.org
+          GOWORK: "off"
+        shell: bash
+        run: |
+          set -euo pipefail
+          module="github.com/alasti-company/shipd-go@${RELEASE_TAG}"
+          for attempt in {1..10}; do
+            if go mod download -json "$module"; then
+              echo "Published ${module}" >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+            if (( attempt < 10 )); then
+              sleep 30
+            fi
+          done
+          echo "::error::Go proxy could not download ${module}; re-run the failed publish job."
+          exit 1
