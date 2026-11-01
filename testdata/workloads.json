@@ -1,0 +1,1237 @@
+{
+  "cases": [
+    {
+      "key": "boolean",
+      "expectedReason": "fallthrough",
+      "expectedRuleId": "",
+      "expectedValue": true
+    },
+    {
+      "key": "attribute",
+      "expectedReason": "rule_match",
+      "expectedRuleId": "target",
+      "expectedValue": true
+    },
+    {
+      "key": "percentage",
+      "expectedReason": "",
+      "expectedRuleId": "",
+      "requireBothOutcomes": true
+    },
+    {
+      "key": "rules-first",
+      "expectedReason": "rule_match",
+      "expectedRuleId": "rule-0",
+      "expectedValue": true
+    },
+    {
+      "key": "rules-last",
+      "expectedReason": "rule_match",
+      "expectedRuleId": "rule-19",
+      "expectedValue": true
+    },
+    {
+      "key": "audience",
+      "expectedReason": "rule_match",
+      "expectedRuleId": "audience",
+      "expectedValue": true
+    }
+  ],
+  "contexts": [
+    {
+      "userId": "bench-user-0",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-1",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-2",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-3",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-4",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-5",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-6",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-7",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-8",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-9",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-10",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-11",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-12",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-13",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-14",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-15",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-16",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-17",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-18",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-19",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-20",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-21",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-22",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-23",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-24",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-25",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-26",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-27",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-28",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-29",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-30",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-31",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-32",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-33",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-34",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-35",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-36",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-37",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-38",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-39",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-40",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-41",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-42",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-43",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-44",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-45",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-46",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-47",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-48",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-49",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-50",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-51",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-52",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-53",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-54",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-55",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-56",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-57",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-58",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-59",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-60",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-61",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-62",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    },
+    {
+      "userId": "bench-user-63",
+      "attributes": {
+        "plan": "pro",
+        "country": "US"
+      }
+    }
+  ],
+  "snapshot": {
+    "schemaVersion": 1,
+    "projectId": "bench",
+    "environmentId": "bench",
+    "environmentKey": "benchmark",
+    "version": 1,
+    "generatedAt": "2026-01-01T00:00:00Z",
+    "flags": {
+      "boolean": {
+        "key": "boolean",
+        "type": "boolean",
+        "enabled": true,
+        "default": false,
+        "rules": [],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": true
+        },
+        "version": 1
+      },
+      "attribute": {
+        "key": "attribute",
+        "type": "boolean",
+        "enabled": true,
+        "default": false,
+        "rules": [
+          {
+            "id": "target",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "plan",
+                "operator": "eq",
+                "value": "pro"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        },
+        "version": 1
+      },
+      "percentage": {
+        "key": "percentage",
+        "type": "boolean",
+        "enabled": true,
+        "default": false,
+        "rules": [
+          {
+            "id": "rollout",
+            "conditions": [
+              {
+                "kind": "percentage",
+                "rollout": 50
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        },
+        "version": 1
+      },
+      "rules-first": {
+        "key": "rules-first",
+        "type": "boolean",
+        "enabled": true,
+        "default": false,
+        "rules": [
+          {
+            "id": "rule-0",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "plan",
+                "operator": "eq",
+                "value": "pro"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          },
+          {
+            "id": "rule-1",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "plan",
+                "operator": "eq",
+                "value": "plan-1"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          },
+          {
+            "id": "rule-2",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "plan",
+                "operator": "eq",
+                "value": "plan-2"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          },
+          {
+            "id": "rule-3",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "plan",
+                "operator": "eq",
+                "value": "plan-3"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          },
+          {
+            "id": "rule-4",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "plan",
+                "operator": "eq",
+                "value": "plan-4"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          },
+          {
+            "id": "rule-5",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "plan",
+                "operator": "eq",
+                "value": "plan-5"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          },
+          {
+            "id": "rule-6",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "plan",
+                "operator": "eq",
+                "value": "plan-6"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          },
+          {
+            "id": "rule-7",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "plan",
+                "operator": "eq",
+                "value": "plan-7"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          },
+          {
+            "id": "rule-8",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "plan",
+                "operator": "eq",
+                "value": "plan-8"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          },
+          {
+            "id": "rule-9",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "plan",
+                "operator": "eq",
+                "value": "plan-9"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          },
+          {
+            "id": "rule-10",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "plan",
+                "operator": "eq",
+                "value": "plan-10"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          },
+          {
+            "id": "rule-11",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "plan",
+                "operator": "eq",
+                "value": "plan-11"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          },
+          {
+            "id": "rule-12",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "plan",
+                "operator": "eq",
+                "value": "plan-12"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          },
+          {
+            "id": "rule-13",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "plan",
+                "operator": "eq",
+                "value": "plan-13"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          },
+          {
+            "id": "rule-14",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "plan",
+                "operator": "eq",
+                "value": "plan-14"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          },
+          {
+            "id": "rule-15",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "plan",
+                "operator": "eq",
+                "value": "plan-15"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          },
+          {
+            "id": "rule-16",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "plan",
+                "operator": "eq",
+                "value": "plan-16"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          },
+          {
+            "id": "rule-17",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "plan",
+                "operator": "eq",
+                "value": "plan-17"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          },
+          {
+            "id": "rule-18",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "plan",
+                "operator": "eq",
+                "value": "plan-18"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          },
+          {
+            "id": "rule-19",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "plan",
+                "operator": "eq",
+                "value": "plan-19"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        },
+        "version": 1
+      },
+      "rules-last": {
+        "key": "rules-last",
+        "type": "boolean",
+        "enabled": true,
+        "default": false,
+        "rules": [
+          {
+            "id": "rule-0",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "plan",
+                "operator": "eq",
+                "value": "plan-0"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          },
+          {
+            "id": "rule-1",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "plan",
+                "operator": "eq",
+                "value": "plan-1"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          },
+          {
+            "id": "rule-2",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "plan",
+                "operator": "eq",
+                "value": "plan-2"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          },
+          {
+            "id": "rule-3",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "plan",
+                "operator": "eq",
+                "value": "plan-3"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          },
+          {
+            "id": "rule-4",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "plan",
+                "operator": "eq",
+                "value": "plan-4"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          },
+          {
+            "id": "rule-5",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "plan",
+                "operator": "eq",
+                "value": "plan-5"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          },
+          {
+            "id": "rule-6",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "plan",
+                "operator": "eq",
+                "value": "plan-6"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          },
+          {
+            "id": "rule-7",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "plan",
+                "operator": "eq",
+                "value": "plan-7"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          },
+          {
+            "id": "rule-8",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "plan",
+                "operator": "eq",
+                "value": "plan-8"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          },
+          {
+            "id": "rule-9",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "plan",
+                "operator": "eq",
+                "value": "plan-9"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          },
+          {
+            "id": "rule-10",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "plan",
+                "operator": "eq",
+                "value": "plan-10"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          },
+          {
+            "id": "rule-11",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "plan",
+                "operator": "eq",
+                "value": "plan-11"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          },
+          {
+            "id": "rule-12",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "plan",
+                "operator": "eq",
+                "value": "plan-12"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          },
+          {
+            "id": "rule-13",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "plan",
+                "operator": "eq",
+                "value": "plan-13"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          },
+          {
+            "id": "rule-14",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "plan",
+                "operator": "eq",
+                "value": "plan-14"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          },
+          {
+            "id": "rule-15",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "plan",
+                "operator": "eq",
+                "value": "plan-15"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          },
+          {
+            "id": "rule-16",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "plan",
+                "operator": "eq",
+                "value": "plan-16"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          },
+          {
+            "id": "rule-17",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "plan",
+                "operator": "eq",
+                "value": "plan-17"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          },
+          {
+            "id": "rule-18",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "plan",
+                "operator": "eq",
+                "value": "plan-18"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          },
+          {
+            "id": "rule-19",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "plan",
+                "operator": "eq",
+                "value": "pro"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        },
+        "version": 1
+      },
+      "audience": {
+        "key": "audience",
+        "type": "boolean",
+        "enabled": true,
+        "default": false,
+        "rules": [
+          {
+            "id": "audience",
+            "conditions": [
+              {
+                "kind": "segment",
+                "segmentId": "paid-us"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        },
+        "version": 1
+      }
+    },
+    "segments": {
+      "paid-us": {
+        "id": "paid-us",
+        "conditions": [
+          {
+            "kind": "attribute",
+            "attribute": "plan",
+            "operator": "eq",
+            "value": "pro"
+          },
+          {
+            "kind": "attribute",
+            "attribute": "country",
+            "operator": "eq",
+            "value": "US"
+          }
+        ]
+      }
+    }
+  }
+}

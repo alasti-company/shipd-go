@@ -1,0 +1,908 @@
+[
+  {
+    "name": "explicit empty rules",
+    "valid": true,
+    "definition": {
+      "type": "boolean",
+      "default": false,
+      "targeting": {
+        "enabled": true,
+        "rules": [],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        }
+      }
+    }
+  },
+  {
+    "name": "enum trait startsWith accepts partial string",
+    "valid": true,
+    "definition": {
+      "type": "boolean",
+      "default": false,
+      "targeting": {
+        "enabled": true,
+        "rules": [
+          {
+            "id": "one",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "plan",
+                "operator": "startsWith",
+                "value": "p"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        }
+      },
+      "traits": {
+        "plan": {
+          "type": "string",
+          "values": ["free", "pro"]
+        }
+      }
+    }
+  },
+  {
+    "name": "enum trait endsWith accepts partial string",
+    "valid": true,
+    "definition": {
+      "type": "boolean",
+      "default": false,
+      "targeting": {
+        "enabled": true,
+        "rules": [
+          {
+            "id": "one",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "plan",
+                "operator": "endsWith",
+                "value": "p"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        }
+      },
+      "traits": {
+        "plan": {
+          "type": "string",
+          "values": ["free", "pro"]
+        }
+      }
+    }
+  },
+  {
+    "name": "enum trait contains accepts partial string",
+    "valid": true,
+    "definition": {
+      "type": "boolean",
+      "default": false,
+      "targeting": {
+        "enabled": true,
+        "rules": [
+          {
+            "id": "one",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "plan",
+                "operator": "contains",
+                "value": "p"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        }
+      },
+      "traits": {
+        "plan": {
+          "type": "string",
+          "values": ["free", "pro"]
+        }
+      }
+    }
+  },
+  {
+    "name": "enum trait eq rejects unknown member",
+    "valid": false,
+    "definition": {
+      "type": "boolean",
+      "default": false,
+      "targeting": {
+        "enabled": true,
+        "rules": [
+          {
+            "id": "one",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "plan",
+                "operator": "eq",
+                "value": "enterprise"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        }
+      },
+      "traits": {
+        "plan": {
+          "type": "string",
+          "values": ["free", "pro"]
+        }
+      }
+    }
+  },
+  {
+    "name": "enum trait neq rejects unknown member",
+    "valid": false,
+    "definition": {
+      "type": "boolean",
+      "default": false,
+      "targeting": {
+        "enabled": true,
+        "rules": [
+          {
+            "id": "one",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "plan",
+                "operator": "neq",
+                "value": "enterprise"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        }
+      },
+      "traits": {
+        "plan": {
+          "type": "string",
+          "values": ["free", "pro"]
+        }
+      }
+    }
+  },
+  {
+    "name": "enum trait in rejects unknown member",
+    "valid": false,
+    "definition": {
+      "type": "boolean",
+      "default": false,
+      "targeting": {
+        "enabled": true,
+        "rules": [
+          {
+            "id": "one",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "plan",
+                "operator": "in",
+                "value": ["enterprise"]
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        }
+      },
+      "traits": {
+        "plan": {
+          "type": "string",
+          "values": ["free", "pro"]
+        }
+      }
+    }
+  },
+  {
+    "name": "enum trait not_in rejects unknown member",
+    "valid": false,
+    "definition": {
+      "type": "boolean",
+      "default": false,
+      "targeting": {
+        "enabled": true,
+        "rules": [
+          {
+            "id": "one",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "plan",
+                "operator": "not_in",
+                "value": ["enterprise"]
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        }
+      },
+      "traits": {
+        "plan": {
+          "type": "string",
+          "values": ["free", "pro"]
+        }
+      }
+    }
+  },
+  {
+    "name": "empty trait enum",
+    "valid": false,
+    "definition": {
+      "type": "boolean",
+      "default": false,
+      "targeting": {
+        "enabled": true,
+        "rules": [],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        }
+      },
+      "traits": {
+        "plan": {
+          "type": "string",
+          "values": []
+        }
+      }
+    }
+  },
+  {
+    "name": "reserved trait name",
+    "valid": false,
+    "definition": {
+      "type": "boolean",
+      "default": false,
+      "targeting": {
+        "enabled": true,
+        "rules": [],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        }
+      },
+      "traits": {
+        "__proto__": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  {
+    "name": "built-in traits are strings",
+    "valid": false,
+    "definition": {
+      "type": "boolean",
+      "default": false,
+      "targeting": {
+        "enabled": true,
+        "rules": [],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        }
+      },
+      "traits": {
+        "userId": {
+          "type": "number"
+        }
+      }
+    }
+  },
+  {
+    "name": "built-in string trait may declare an enum",
+    "valid": true,
+    "definition": {
+      "type": "boolean",
+      "default": false,
+      "targeting": {
+        "enabled": true,
+        "rules": [
+          {
+            "id": "one",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "country",
+                "operator": "eq",
+                "value": "US"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        }
+      },
+      "traits": {
+        "country": {
+          "type": "string",
+          "values": ["US", "CA"]
+        }
+      }
+    }
+  },
+  {
+    "name": "undeclared percentage bucket",
+    "valid": false,
+    "definition": {
+      "type": "boolean",
+      "default": false,
+      "targeting": {
+        "enabled": true,
+        "rules": [
+          {
+            "id": "one",
+            "conditions": [
+              {
+                "kind": "percentage",
+                "rollout": 25,
+                "attribute": "company"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        }
+      },
+      "traits": {}
+    }
+  },
+  {
+    "name": "boolean input cannot use numeric comparison",
+    "valid": false,
+    "definition": {
+      "type": "boolean",
+      "default": false,
+      "targeting": {
+        "enabled": true,
+        "rules": [
+          {
+            "id": "one",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "employee",
+                "operator": "gt",
+                "value": 1
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        }
+      },
+      "traits": {
+        "employee": {
+          "type": "boolean"
+        }
+      }
+    }
+  },
+  {
+    "name": "numeric input compares with numbers",
+    "valid": true,
+    "definition": {
+      "type": "boolean",
+      "default": false,
+      "targeting": {
+        "enabled": true,
+        "rules": [
+          {
+            "id": "one",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "age",
+                "operator": "gte",
+                "value": 18
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        }
+      },
+      "traits": {
+        "age": {
+          "type": "number"
+        }
+      }
+    }
+  },
+  {
+    "name": "nested JSON serve",
+    "valid": true,
+    "definition": {
+      "type": "json",
+      "default": {
+        "a": [false, 0, null]
+      },
+      "targeting": {
+        "enabled": true,
+        "rules": [],
+        "fallthrough": {
+          "kind": "json",
+          "value": {
+            "a": [false, 0, null]
+          }
+        }
+      }
+    }
+  },
+  {
+    "name": "JSON null serve",
+    "valid": true,
+    "definition": {
+      "type": "json",
+      "default": null,
+      "targeting": {
+        "enabled": true,
+        "rules": [],
+        "fallthrough": {
+          "kind": "json",
+          "value": null
+        }
+      }
+    }
+  },
+  {
+    "name": "group depth 8",
+    "valid": true,
+    "definition": {
+      "type": "boolean",
+      "default": false,
+      "targeting": {
+        "enabled": true,
+        "rules": [
+          {
+            "id": "one",
+            "conditions": [
+              {
+                "kind": "group",
+                "op": "and",
+                "conditions": [
+                  {
+                    "kind": "group",
+                    "op": "and",
+                    "conditions": [
+                      {
+                        "kind": "group",
+                        "op": "and",
+                        "conditions": [
+                          {
+                            "kind": "group",
+                            "op": "and",
+                            "conditions": [
+                              {
+                                "kind": "group",
+                                "op": "and",
+                                "conditions": [
+                                  {
+                                    "kind": "group",
+                                    "op": "and",
+                                    "conditions": [
+                                      {
+                                        "kind": "group",
+                                        "op": "and",
+                                        "conditions": [
+                                          {
+                                            "kind": "group",
+                                            "op": "and",
+                                            "conditions": [
+                                              {
+                                                "kind": "always"
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        }
+      }
+    }
+  },
+  {
+    "name": "group depth 9",
+    "valid": false,
+    "definition": {
+      "type": "boolean",
+      "default": false,
+      "targeting": {
+        "enabled": true,
+        "rules": [
+          {
+            "id": "one",
+            "conditions": [
+              {
+                "kind": "group",
+                "op": "and",
+                "conditions": [
+                  {
+                    "kind": "group",
+                    "op": "and",
+                    "conditions": [
+                      {
+                        "kind": "group",
+                        "op": "and",
+                        "conditions": [
+                          {
+                            "kind": "group",
+                            "op": "and",
+                            "conditions": [
+                              {
+                                "kind": "group",
+                                "op": "and",
+                                "conditions": [
+                                  {
+                                    "kind": "group",
+                                    "op": "and",
+                                    "conditions": [
+                                      {
+                                        "kind": "group",
+                                        "op": "and",
+                                        "conditions": [
+                                          {
+                                            "kind": "group",
+                                            "op": "and",
+                                            "conditions": [
+                                              {
+                                                "kind": "group",
+                                                "op": "and",
+                                                "conditions": [
+                                                  {
+                                                    "kind": "always"
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        }
+      }
+    }
+  },
+  {
+    "name": "overflowing total weight",
+    "valid": false,
+    "definition": {
+      "type": "boolean",
+      "default": false,
+      "targeting": {
+        "enabled": true,
+        "rules": [],
+        "fallthrough": {
+          "kind": "weighted",
+          "variations": [
+            {
+              "weight": 1e308,
+              "serve": {
+                "kind": "boolean",
+                "value": true
+              }
+            },
+            {
+              "weight": 1e308,
+              "serve": {
+                "kind": "boolean",
+                "value": false
+              }
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "duplicate rule IDs",
+    "valid": false,
+    "definition": {
+      "type": "boolean",
+      "default": false,
+      "targeting": {
+        "enabled": true,
+        "rules": [
+          {
+            "id": "one",
+            "conditions": [
+              {
+                "kind": "always"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          },
+          {
+            "id": "one",
+            "conditions": [
+              {
+                "kind": "always"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        }
+      }
+    }
+  },
+  {
+    "name": "string timestamp comparison gt",
+    "valid": true,
+    "definition": {
+      "type": "boolean",
+      "default": false,
+      "traits": {
+        "createdAt": {
+          "type": "string"
+        }
+      },
+      "targeting": {
+        "enabled": true,
+        "rules": [
+          {
+            "id": "date",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "createdAt",
+                "operator": "gt",
+                "value": "2026-01-01T00:00:00Z"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        }
+      }
+    }
+  },
+  {
+    "name": "string timestamp comparison gte",
+    "valid": true,
+    "definition": {
+      "type": "boolean",
+      "default": false,
+      "traits": {
+        "createdAt": {
+          "type": "string"
+        }
+      },
+      "targeting": {
+        "enabled": true,
+        "rules": [
+          {
+            "id": "date",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "createdAt",
+                "operator": "gte",
+                "value": "2026-01-01T00:00:00Z"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        }
+      }
+    }
+  },
+  {
+    "name": "string timestamp comparison lt",
+    "valid": true,
+    "definition": {
+      "type": "boolean",
+      "default": false,
+      "traits": {
+        "createdAt": {
+          "type": "string"
+        }
+      },
+      "targeting": {
+        "enabled": true,
+        "rules": [
+          {
+            "id": "date",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "createdAt",
+                "operator": "lt",
+                "value": "2026-01-01T00:00:00Z"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        }
+      }
+    }
+  },
+  {
+    "name": "string timestamp comparison lte",
+    "valid": true,
+    "definition": {
+      "type": "boolean",
+      "default": false,
+      "traits": {
+        "createdAt": {
+          "type": "string"
+        }
+      },
+      "targeting": {
+        "enabled": true,
+        "rules": [
+          {
+            "id": "date",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "createdAt",
+                "operator": "lte",
+                "value": "2026-01-01T00:00:00Z"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        }
+      }
+    }
+  }
+]

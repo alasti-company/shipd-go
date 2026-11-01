@@ -1,0 +1,7 @@
+# Local tooling and credentials
+.DS_Store
+.env
+.env.*
+.shipd-go-*
+*.test
+coverage.out

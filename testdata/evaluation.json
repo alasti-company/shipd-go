@@ -1,0 +1,2628 @@
+{
+  "cases": [
+    {
+      "name": "new-checkout: usr_123",
+      "key": "new-checkout",
+      "context": {
+        "userId": "usr_123"
+      },
+      "expected": {
+        "key": "new-checkout",
+        "serve": {
+          "kind": "boolean",
+          "value": true
+        },
+        "reason": "rule_match",
+        "ruleId": "rollout"
+      }
+    },
+    {
+      "name": "search-variant: usr_123",
+      "key": "search-variant",
+      "context": {
+        "userId": "usr_123"
+      },
+      "expected": {
+        "key": "search-variant",
+        "serve": {
+          "kind": "variant",
+          "value": "control"
+        },
+        "reason": "fallthrough"
+      }
+    },
+    {
+      "name": "new-checkout: alice",
+      "key": "new-checkout",
+      "context": {
+        "userId": "alice"
+      },
+      "expected": {
+        "key": "new-checkout",
+        "serve": {
+          "kind": "boolean",
+          "value": true
+        },
+        "reason": "rule_match",
+        "ruleId": "rollout"
+      }
+    },
+    {
+      "name": "search-variant: alice",
+      "key": "search-variant",
+      "context": {
+        "userId": "alice"
+      },
+      "expected": {
+        "key": "search-variant",
+        "serve": {
+          "kind": "variant",
+          "value": "control"
+        },
+        "reason": "fallthrough"
+      }
+    },
+    {
+      "name": "new-checkout: 用户",
+      "key": "new-checkout",
+      "context": {
+        "userId": "用户"
+      },
+      "expected": {
+        "key": "new-checkout",
+        "serve": {
+          "kind": "boolean",
+          "value": false
+        },
+        "reason": "fallthrough"
+      }
+    },
+    {
+      "name": "search-variant: 用户",
+      "key": "search-variant",
+      "context": {
+        "userId": "用户"
+      },
+      "expected": {
+        "key": "search-variant",
+        "serve": {
+          "kind": "variant",
+          "value": "control"
+        },
+        "reason": "fallthrough"
+      }
+    },
+    {
+      "name": "new-checkout: 😀",
+      "key": "new-checkout",
+      "context": {
+        "userId": "😀"
+      },
+      "expected": {
+        "key": "new-checkout",
+        "serve": {
+          "kind": "boolean",
+          "value": false
+        },
+        "reason": "fallthrough"
+      }
+    },
+    {
+      "name": "search-variant: 😀",
+      "key": "search-variant",
+      "context": {
+        "userId": "😀"
+      },
+      "expected": {
+        "key": "search-variant",
+        "serve": {
+          "kind": "variant",
+          "value": "control"
+        },
+        "reason": "fallthrough"
+      }
+    },
+    {
+      "name": "new-checkout: café",
+      "key": "new-checkout",
+      "context": {
+        "userId": "café"
+      },
+      "expected": {
+        "key": "new-checkout",
+        "serve": {
+          "kind": "boolean",
+          "value": false
+        },
+        "reason": "fallthrough"
+      }
+    },
+    {
+      "name": "search-variant: café",
+      "key": "search-variant",
+      "context": {
+        "userId": "café"
+      },
+      "expected": {
+        "key": "search-variant",
+        "serve": {
+          "kind": "variant",
+          "value": "control"
+        },
+        "reason": "fallthrough"
+      }
+    },
+    {
+      "name": "new-checkout: a😀z",
+      "key": "new-checkout",
+      "context": {
+        "userId": "a😀z"
+      },
+      "expected": {
+        "key": "new-checkout",
+        "serve": {
+          "kind": "boolean",
+          "value": false
+        },
+        "reason": "fallthrough"
+      }
+    },
+    {
+      "name": "search-variant: a😀z",
+      "key": "search-variant",
+      "context": {
+        "userId": "a😀z"
+      },
+      "expected": {
+        "key": "search-variant",
+        "serve": {
+          "kind": "variant",
+          "value": "control"
+        },
+        "reason": "fallthrough"
+      }
+    },
+    {
+      "name": "new-checkout: anonymous",
+      "key": "new-checkout",
+      "context": {
+        "userId": ""
+      },
+      "expected": {
+        "key": "new-checkout",
+        "serve": {
+          "kind": "boolean",
+          "value": false
+        },
+        "reason": "fallthrough"
+      }
+    },
+    {
+      "name": "search-variant: anonymous",
+      "key": "search-variant",
+      "context": {
+        "userId": ""
+      },
+      "expected": {
+        "key": "search-variant",
+        "serve": {
+          "kind": "disabled"
+        },
+        "reason": "fallthrough"
+      }
+    },
+    {
+      "name": "compiled audience",
+      "key": "new-checkout",
+      "context": {
+        "userId": "usr_123",
+        "attributes": {
+          "plan": "pro"
+        }
+      },
+      "expected": {
+        "key": "new-checkout",
+        "serve": {
+          "kind": "boolean",
+          "value": true
+        },
+        "reason": "rule_match",
+        "ruleId": "pro-audience"
+      }
+    },
+    {
+      "name": "explicit audience",
+      "key": "new-checkout",
+      "context": {
+        "segmentIds": ["pro"]
+      },
+      "expected": {
+        "key": "new-checkout",
+        "serve": {
+          "kind": "boolean",
+          "value": true
+        },
+        "reason": "rule_match",
+        "ruleId": "pro-audience"
+      }
+    },
+    {
+      "name": "numeric coercion",
+      "key": "max-retries",
+      "context": {
+        "attributes": {
+          "age": "20"
+        }
+      },
+      "expected": {
+        "key": "max-retries",
+        "serve": {
+          "kind": "number",
+          "value": 7
+        },
+        "reason": "rule_match",
+        "ruleId": "group"
+      }
+    },
+    {
+      "name": "group fallthrough",
+      "key": "max-retries",
+      "context": {
+        "attributes": {
+          "age": 16
+        }
+      },
+      "expected": {
+        "key": "max-retries",
+        "serve": {
+          "kind": "number",
+          "value": 3
+        },
+        "reason": "fallthrough"
+      }
+    },
+    {
+      "name": "JSON",
+      "key": "checkout-payload",
+      "context": {},
+      "expected": {
+        "key": "checkout-payload",
+        "serve": {
+          "kind": "json",
+          "value": {
+            "mode": "strict"
+          }
+        },
+        "reason": "fallthrough"
+      }
+    },
+    {
+      "name": "disabled",
+      "key": "disabled",
+      "context": {},
+      "expected": {
+        "key": "disabled",
+        "serve": {
+          "kind": "disabled"
+        },
+        "reason": "flag_disabled"
+      }
+    },
+    {
+      "name": "missing",
+      "key": "missing",
+      "context": {},
+      "expected": {
+        "key": "missing",
+        "serve": {
+          "kind": "disabled"
+        },
+        "reason": "not_found"
+      }
+    },
+    {
+      "name": "eq \"1\"",
+      "key": "operator-21",
+      "context": {
+        "attributes": {
+          "trait": "1"
+        }
+      },
+      "expected": {
+        "key": "operator-21",
+        "serve": {
+          "kind": "boolean",
+          "value": true
+        },
+        "reason": "rule_match",
+        "ruleId": "match"
+      }
+    },
+    {
+      "name": "neq \"pro\"",
+      "key": "operator-22",
+      "context": {
+        "attributes": {
+          "trait": "pro"
+        }
+      },
+      "expected": {
+        "key": "operator-22",
+        "serve": {
+          "kind": "boolean",
+          "value": true
+        },
+        "reason": "rule_match",
+        "ruleId": "match"
+      }
+    },
+    {
+      "name": "in \"pro\"",
+      "key": "operator-23",
+      "context": {
+        "attributes": {
+          "trait": "pro"
+        }
+      },
+      "expected": {
+        "key": "operator-23",
+        "serve": {
+          "kind": "boolean",
+          "value": true
+        },
+        "reason": "rule_match",
+        "ruleId": "match"
+      }
+    },
+    {
+      "name": "not_in \"other\"",
+      "key": "operator-24",
+      "context": {
+        "attributes": {
+          "trait": "other"
+        }
+      },
+      "expected": {
+        "key": "operator-24",
+        "serve": {
+          "kind": "boolean",
+          "value": true
+        },
+        "reason": "rule_match",
+        "ruleId": "match"
+      }
+    },
+    {
+      "name": "contains \"hello world\"",
+      "key": "operator-25",
+      "context": {
+        "attributes": {
+          "trait": "hello world"
+        }
+      },
+      "expected": {
+        "key": "operator-25",
+        "serve": {
+          "kind": "boolean",
+          "value": true
+        },
+        "reason": "rule_match",
+        "ruleId": "match"
+      }
+    },
+    {
+      "name": "startsWith \"hello\"",
+      "key": "operator-26",
+      "context": {
+        "attributes": {
+          "trait": "hello"
+        }
+      },
+      "expected": {
+        "key": "operator-26",
+        "serve": {
+          "kind": "boolean",
+          "value": true
+        },
+        "reason": "rule_match",
+        "ruleId": "match"
+      }
+    },
+    {
+      "name": "endsWith \"hello\"",
+      "key": "operator-27",
+      "context": {
+        "attributes": {
+          "trait": "hello"
+        }
+      },
+      "expected": {
+        "key": "operator-27",
+        "serve": {
+          "kind": "boolean",
+          "value": true
+        },
+        "reason": "rule_match",
+        "ruleId": "match"
+      }
+    },
+    {
+      "name": "gt 20",
+      "key": "operator-28",
+      "context": {
+        "attributes": {
+          "trait": 20
+        }
+      },
+      "expected": {
+        "key": "operator-28",
+        "serve": {
+          "kind": "boolean",
+          "value": true
+        },
+        "reason": "rule_match",
+        "ruleId": "match"
+      }
+    },
+    {
+      "name": "gte \"2026-01-02\"",
+      "key": "operator-29",
+      "context": {
+        "attributes": {
+          "trait": "2026-01-02"
+        }
+      },
+      "expected": {
+        "key": "operator-29",
+        "serve": {
+          "kind": "boolean",
+          "value": true
+        },
+        "reason": "rule_match",
+        "ruleId": "match"
+      }
+    },
+    {
+      "name": "lt false",
+      "key": "operator-30",
+      "context": {
+        "attributes": {
+          "trait": false
+        }
+      },
+      "expected": {
+        "key": "operator-30",
+        "serve": {
+          "kind": "boolean",
+          "value": true
+        },
+        "reason": "rule_match",
+        "ruleId": "match"
+      }
+    },
+    {
+      "name": "lte \"a\"",
+      "key": "operator-31",
+      "context": {
+        "attributes": {
+          "trait": "a"
+        }
+      },
+      "expected": {
+        "key": "operator-31",
+        "serve": {
+          "kind": "boolean",
+          "value": true
+        },
+        "reason": "rule_match",
+        "ruleId": "match"
+      }
+    },
+    {
+      "name": "exists null",
+      "key": "operator-32",
+      "context": {
+        "attributes": {
+          "trait": null
+        }
+      },
+      "expected": {
+        "key": "operator-32",
+        "serve": {
+          "kind": "boolean",
+          "value": true
+        },
+        "reason": "rule_match",
+        "ruleId": "match"
+      }
+    },
+    {
+      "name": "not_exists undefined",
+      "key": "operator-33",
+      "context": {
+        "attributes": {}
+      },
+      "expected": {
+        "key": "operator-33",
+        "serve": {
+          "kind": "boolean",
+          "value": true
+        },
+        "reason": "rule_match",
+        "ruleId": "match"
+      }
+    },
+    {
+      "name": "eq true",
+      "key": "operator-34",
+      "context": {
+        "attributes": {
+          "trait": true
+        }
+      },
+      "expected": {
+        "key": "operator-34",
+        "serve": {
+          "kind": "boolean",
+          "value": true
+        },
+        "reason": "rule_match",
+        "ruleId": "match"
+      }
+    },
+    {
+      "name": "eq \"0x10\"",
+      "key": "operator-35",
+      "context": {
+        "attributes": {
+          "trait": "0x10"
+        }
+      },
+      "expected": {
+        "key": "operator-35",
+        "serve": {
+          "kind": "boolean",
+          "value": true
+        },
+        "reason": "rule_match",
+        "ruleId": "match"
+      }
+    },
+    {
+      "name": "eq null",
+      "key": "operator-36",
+      "context": {
+        "attributes": {
+          "trait": null
+        }
+      },
+      "expected": {
+        "key": "operator-36",
+        "serve": {
+          "kind": "boolean",
+          "value": false
+        },
+        "reason": "fallthrough"
+      }
+    },
+    {
+      "name": "gte \"2026-01-02T00:00:00Z\"",
+      "key": "operator-37",
+      "context": {
+        "attributes": {
+          "trait": "2026-01-02T00:00:00Z"
+        }
+      },
+      "expected": {
+        "key": "operator-37",
+        "serve": {
+          "kind": "boolean",
+          "value": true
+        },
+        "reason": "rule_match",
+        "ruleId": "match"
+      }
+    },
+    {
+      "name": "eq true",
+      "key": "operator-38",
+      "context": {
+        "attributes": {
+          "trait": true
+        }
+      },
+      "expected": {
+        "key": "operator-38",
+        "serve": {
+          "kind": "boolean",
+          "value": false
+        },
+        "reason": "fallthrough"
+      }
+    },
+    {
+      "name": "contains 1e+21",
+      "key": "operator-39",
+      "context": {
+        "attributes": {
+          "trait": 1e21
+        }
+      },
+      "expected": {
+        "key": "operator-39",
+        "serve": {
+          "kind": "boolean",
+          "value": true
+        },
+        "reason": "rule_match",
+        "ruleId": "match"
+      }
+    },
+    {
+      "name": "cyclic segment bounded",
+      "key": "cycle",
+      "context": {},
+      "expected": {
+        "key": "cycle",
+        "serve": {
+          "kind": "boolean",
+          "value": false
+        },
+        "reason": "fallthrough"
+      }
+    },
+    {
+      "name": "skip weighted without unit",
+      "key": "skip-weighted",
+      "context": {},
+      "expected": {
+        "key": "skip-weighted",
+        "serve": {
+          "kind": "variant",
+          "value": "semantic"
+        },
+        "reason": "rule_match",
+        "ruleId": "next-rule"
+      }
+    },
+    {
+      "name": "custom seed and attribute",
+      "key": "custom-bucket",
+      "context": {
+        "attributes": {
+          "accountId": 123
+        }
+      },
+      "expected": {
+        "key": "custom-bucket",
+        "serve": {
+          "kind": "boolean",
+          "value": false
+        },
+        "reason": "fallthrough"
+      }
+    },
+    {
+      "name": "numeric literal: underscores are not numbers (\"1_000\" > \"9\" as strings)",
+      "key": "number-literal",
+      "context": {
+        "attributes": {
+          "trait": "1_000"
+        }
+      },
+      "expected": {
+        "key": "number-literal",
+        "serve": {
+          "kind": "boolean",
+          "value": false
+        },
+        "reason": "fallthrough"
+      }
+    },
+    {
+      "name": "numeric literal: prefixed underscores are not numbers (\"0x_10\")",
+      "key": "number-literal",
+      "context": {
+        "attributes": {
+          "trait": "0x_10"
+        }
+      },
+      "expected": {
+        "key": "number-literal",
+        "serve": {
+          "kind": "boolean",
+          "value": false
+        },
+        "reason": "fallthrough"
+      }
+    },
+    {
+      "name": "numeric literal: binary underscores are not numbers (\"0b1_0\")",
+      "key": "number-literal",
+      "context": {
+        "attributes": {
+          "trait": "0b1_0"
+        }
+      },
+      "expected": {
+        "key": "number-literal",
+        "serve": {
+          "kind": "boolean",
+          "value": false
+        },
+        "reason": "fallthrough"
+      }
+    },
+    {
+      "name": "numeric literal: unsigned hex is a number (\"0x10\" = 16)",
+      "key": "number-literal",
+      "context": {
+        "attributes": {
+          "trait": "0x10"
+        }
+      },
+      "expected": {
+        "key": "number-literal",
+        "serve": {
+          "kind": "boolean",
+          "value": true
+        },
+        "reason": "rule_match",
+        "ruleId": "match"
+      }
+    },
+    {
+      "name": "numeric literal: binary is a number (\"0b1111\" = 15)",
+      "key": "number-literal",
+      "context": {
+        "attributes": {
+          "trait": "0b1111"
+        }
+      },
+      "expected": {
+        "key": "number-literal",
+        "serve": {
+          "kind": "boolean",
+          "value": true
+        },
+        "reason": "rule_match",
+        "ruleId": "match"
+      }
+    },
+    {
+      "name": "numeric literal: exponent is a number (\"1e1\" = 10)",
+      "key": "number-literal",
+      "context": {
+        "attributes": {
+          "trait": "1e1"
+        }
+      },
+      "expected": {
+        "key": "number-literal",
+        "serve": {
+          "kind": "boolean",
+          "value": true
+        },
+        "reason": "rule_match",
+        "ruleId": "match"
+      }
+    },
+    {
+      "name": "numeric literal: signed hex float is not a number (\"-0x1p-2\")",
+      "key": "number-negative",
+      "context": {
+        "attributes": {
+          "trait": "-0x1p-2"
+        }
+      },
+      "expected": {
+        "key": "number-negative",
+        "serve": {
+          "kind": "boolean",
+          "value": false
+        },
+        "reason": "fallthrough"
+      }
+    },
+    {
+      "name": "numeric literal: JavaScript trim removes U+FEFF",
+      "key": "number-trim",
+      "context": {
+        "attributes": {
+          "trait": "﻿5"
+        }
+      },
+      "expected": {
+        "key": "number-trim",
+        "serve": {
+          "kind": "boolean",
+          "value": true
+        },
+        "reason": "rule_match",
+        "ruleId": "match"
+      }
+    },
+    {
+      "name": "numeric literal: JavaScript trim keeps U+0085",
+      "key": "number-trim",
+      "context": {
+        "attributes": {
+          "trait": "5"
+        }
+      },
+      "expected": {
+        "key": "number-trim",
+        "serve": {
+          "kind": "boolean",
+          "value": false
+        },
+        "reason": "fallthrough"
+      }
+    },
+    {
+      "name": "timestamp: offsets convert to UTC (09:00Z is not after 10:00Z)",
+      "key": "timestamp-gt",
+      "context": {
+        "attributes": {
+          "at": "2026-01-02T11:00:00+02:00"
+        }
+      },
+      "expected": {
+        "key": "timestamp-gt",
+        "serve": {
+          "kind": "boolean",
+          "value": false
+        },
+        "reason": "fallthrough"
+      }
+    },
+    {
+      "name": "timestamp: fractions truncate to milliseconds",
+      "key": "timestamp-gt",
+      "context": {
+        "attributes": {
+          "at": "2026-01-02T10:00:00.0009Z"
+        }
+      },
+      "expected": {
+        "key": "timestamp-gt",
+        "serve": {
+          "kind": "boolean",
+          "value": false
+        },
+        "reason": "fallthrough"
+      }
+    },
+    {
+      "name": "timestamp: millisecond precision",
+      "key": "timestamp-gt",
+      "context": {
+        "attributes": {
+          "at": "2026-01-02T10:00:00.001Z"
+        }
+      },
+      "expected": {
+        "key": "timestamp-gt",
+        "serve": {
+          "kind": "boolean",
+          "value": true
+        },
+        "reason": "rule_match",
+        "ruleId": "match"
+      }
+    },
+    {
+      "name": "timestamp: date only is midnight UTC",
+      "key": "timestamp-gt",
+      "context": {
+        "attributes": {
+          "at": "2026-01-03"
+        }
+      },
+      "expected": {
+        "key": "timestamp-gt",
+        "serve": {
+          "kind": "boolean",
+          "value": true
+        },
+        "reason": "rule_match",
+        "ruleId": "match"
+      }
+    },
+    {
+      "name": "timestamp: zone-less date-time compares as a string",
+      "key": "timestamp-gt",
+      "context": {
+        "attributes": {
+          "at": "2026-01-02T09:30"
+        }
+      },
+      "expected": {
+        "key": "timestamp-gt",
+        "serve": {
+          "kind": "boolean",
+          "value": false
+        },
+        "reason": "fallthrough"
+      }
+    },
+    {
+      "name": "timestamp: space separator compares as a string",
+      "key": "timestamp-gt",
+      "context": {
+        "attributes": {
+          "at": "2026-01-02 11:00Z"
+        }
+      },
+      "expected": {
+        "key": "timestamp-gt",
+        "serve": {
+          "kind": "boolean",
+          "value": false
+        },
+        "reason": "fallthrough"
+      }
+    },
+    {
+      "name": "timestamp: impossible date compares as a string (\"2026-02-30\")",
+      "key": "timestamp-lt",
+      "context": {
+        "attributes": {
+          "at": "2026-02-30"
+        }
+      },
+      "expected": {
+        "key": "timestamp-lt",
+        "serve": {
+          "kind": "boolean",
+          "value": true
+        },
+        "reason": "rule_match",
+        "ruleId": "match"
+      }
+    },
+    {
+      "name": "timestamp: 2026 is not a leap year (\"2026-02-29\")",
+      "key": "timestamp-lt",
+      "context": {
+        "attributes": {
+          "at": "2026-02-29"
+        }
+      },
+      "expected": {
+        "key": "timestamp-lt",
+        "serve": {
+          "kind": "boolean",
+          "value": true
+        },
+        "reason": "rule_match",
+        "ruleId": "match"
+      }
+    },
+    {
+      "name": "timestamp: leap day in a leap year is a date",
+      "key": "timestamp-lt",
+      "context": {
+        "attributes": {
+          "at": "2024-02-29"
+        }
+      },
+      "expected": {
+        "key": "timestamp-lt",
+        "serve": {
+          "kind": "boolean",
+          "value": true
+        },
+        "reason": "rule_match",
+        "ruleId": "match"
+      }
+    },
+    {
+      "name": "and group: {'attributes': {'plan': 'pro', 'age': 21}}",
+      "key": "and-group",
+      "context": {
+        "attributes": {
+          "plan": "pro",
+          "age": 21
+        }
+      },
+      "expected": {
+        "key": "and-group",
+        "serve": {
+          "kind": "boolean",
+          "value": true
+        },
+        "reason": "rule_match",
+        "ruleId": "target"
+      }
+    },
+    {
+      "name": "and group: {'attributes': {'plan': 'pro', 'age': 17}}",
+      "key": "and-group",
+      "context": {
+        "attributes": {
+          "plan": "pro",
+          "age": 17
+        }
+      },
+      "expected": {
+        "key": "and-group",
+        "serve": {
+          "kind": "boolean",
+          "value": false
+        },
+        "reason": "fallthrough"
+      }
+    },
+    {
+      "name": "and group: {'attributes': {'plan': 'free', 'age': 21}}",
+      "key": "and-group",
+      "context": {
+        "attributes": {
+          "plan": "free",
+          "age": 21
+        }
+      },
+      "expected": {
+        "key": "and-group",
+        "serve": {
+          "kind": "boolean",
+          "value": false
+        },
+        "reason": "fallthrough"
+      }
+    },
+    {
+      "name": "and group: {}",
+      "key": "and-group",
+      "context": {},
+      "expected": {
+        "key": "and-group",
+        "serve": {
+          "kind": "boolean",
+          "value": false
+        },
+        "reason": "fallthrough"
+      }
+    },
+    {
+      "name": "legacy flat: pro",
+      "key": "legacy-flat",
+      "context": {
+        "attributes": {
+          "plan": "pro"
+        }
+      },
+      "expected": {
+        "key": "legacy-flat",
+        "serve": {
+          "kind": "boolean",
+          "value": true
+        },
+        "reason": "rule_match",
+        "ruleId": "target"
+      }
+    },
+    {
+      "name": "legacy flat: free",
+      "key": "legacy-flat",
+      "context": {
+        "attributes": {
+          "plan": "free"
+        }
+      },
+      "expected": {
+        "key": "legacy-flat",
+        "serve": {
+          "kind": "boolean",
+          "value": false
+        },
+        "reason": "fallthrough"
+      }
+    },
+    {
+      "name": "rollout-0: {}",
+      "key": "rollout-0",
+      "context": {},
+      "expected": {
+        "key": "rollout-0",
+        "serve": {
+          "kind": "boolean",
+          "value": false
+        },
+        "reason": "fallthrough"
+      }
+    },
+    {
+      "name": "rollout-0: {'userId': ''}",
+      "key": "rollout-0",
+      "context": {
+        "userId": ""
+      },
+      "expected": {
+        "key": "rollout-0",
+        "serve": {
+          "kind": "boolean",
+          "value": false
+        },
+        "reason": "fallthrough"
+      }
+    },
+    {
+      "name": "rollout-0: {'userId': 'usr_boundary'}",
+      "key": "rollout-0",
+      "context": {
+        "userId": "usr_boundary"
+      },
+      "expected": {
+        "key": "rollout-0",
+        "serve": {
+          "kind": "boolean",
+          "value": false
+        },
+        "reason": "fallthrough"
+      }
+    },
+    {
+      "name": "rollout-100: {}",
+      "key": "rollout-100",
+      "context": {},
+      "expected": {
+        "key": "rollout-100",
+        "serve": {
+          "kind": "boolean",
+          "value": false
+        },
+        "reason": "fallthrough"
+      }
+    },
+    {
+      "name": "rollout-100: {'userId': ''}",
+      "key": "rollout-100",
+      "context": {
+        "userId": ""
+      },
+      "expected": {
+        "key": "rollout-100",
+        "serve": {
+          "kind": "boolean",
+          "value": false
+        },
+        "reason": "fallthrough"
+      }
+    },
+    {
+      "name": "rollout-100: {'userId': 'usr_boundary'}",
+      "key": "rollout-100",
+      "context": {
+        "userId": "usr_boundary"
+      },
+      "expected": {
+        "key": "rollout-100",
+        "serve": {
+          "kind": "boolean",
+          "value": true
+        },
+        "reason": "rule_match",
+        "ruleId": "target"
+      }
+    },
+    {
+      "name": "user-id-eq: {}",
+      "key": "user-id-eq",
+      "context": {},
+      "expected": {
+        "key": "user-id-eq",
+        "serve": {
+          "kind": "boolean",
+          "value": false
+        },
+        "reason": "fallthrough"
+      }
+    },
+    {
+      "name": "user-id-eq: {'userId': ''}",
+      "key": "user-id-eq",
+      "context": {
+        "userId": ""
+      },
+      "expected": {
+        "key": "user-id-eq",
+        "serve": {
+          "kind": "boolean",
+          "value": true
+        },
+        "reason": "rule_match",
+        "ruleId": "target"
+      }
+    },
+    {
+      "name": "user-id-eq: {'userId': 'usr_present'}",
+      "key": "user-id-eq",
+      "context": {
+        "userId": "usr_present"
+      },
+      "expected": {
+        "key": "user-id-eq",
+        "serve": {
+          "kind": "boolean",
+          "value": false
+        },
+        "reason": "fallthrough"
+      }
+    },
+    {
+      "name": "user-id-eq: {'attributes': {'userId': ''}}",
+      "key": "user-id-eq",
+      "context": {
+        "attributes": {
+          "userId": ""
+        }
+      },
+      "expected": {
+        "key": "user-id-eq",
+        "serve": {
+          "kind": "boolean",
+          "value": true
+        },
+        "reason": "rule_match",
+        "ruleId": "target"
+      }
+    },
+    {
+      "name": "user-id-neq: {}",
+      "key": "user-id-neq",
+      "context": {},
+      "expected": {
+        "key": "user-id-neq",
+        "serve": {
+          "kind": "boolean",
+          "value": false
+        },
+        "reason": "fallthrough"
+      }
+    },
+    {
+      "name": "user-id-neq: {'userId': ''}",
+      "key": "user-id-neq",
+      "context": {
+        "userId": ""
+      },
+      "expected": {
+        "key": "user-id-neq",
+        "serve": {
+          "kind": "boolean",
+          "value": false
+        },
+        "reason": "fallthrough"
+      }
+    },
+    {
+      "name": "user-id-neq: {'userId': 'usr_present'}",
+      "key": "user-id-neq",
+      "context": {
+        "userId": "usr_present"
+      },
+      "expected": {
+        "key": "user-id-neq",
+        "serve": {
+          "kind": "boolean",
+          "value": true
+        },
+        "reason": "rule_match",
+        "ruleId": "target"
+      }
+    },
+    {
+      "name": "user-id-neq: {'attributes': {'userId': ''}}",
+      "key": "user-id-neq",
+      "context": {
+        "attributes": {
+          "userId": ""
+        }
+      },
+      "expected": {
+        "key": "user-id-neq",
+        "serve": {
+          "kind": "boolean",
+          "value": false
+        },
+        "reason": "fallthrough"
+      }
+    },
+    {
+      "name": "user-id-exists: {}",
+      "key": "user-id-exists",
+      "context": {},
+      "expected": {
+        "key": "user-id-exists",
+        "serve": {
+          "kind": "boolean",
+          "value": false
+        },
+        "reason": "fallthrough"
+      }
+    },
+    {
+      "name": "user-id-exists: {'userId': ''}",
+      "key": "user-id-exists",
+      "context": {
+        "userId": ""
+      },
+      "expected": {
+        "key": "user-id-exists",
+        "serve": {
+          "kind": "boolean",
+          "value": false
+        },
+        "reason": "fallthrough"
+      }
+    },
+    {
+      "name": "user-id-exists: {'userId': 'usr_present'}",
+      "key": "user-id-exists",
+      "context": {
+        "userId": "usr_present"
+      },
+      "expected": {
+        "key": "user-id-exists",
+        "serve": {
+          "kind": "boolean",
+          "value": true
+        },
+        "reason": "rule_match",
+        "ruleId": "target"
+      }
+    },
+    {
+      "name": "user-id-exists: {'attributes': {'userId': ''}}",
+      "key": "user-id-exists",
+      "context": {
+        "attributes": {
+          "userId": ""
+        }
+      },
+      "expected": {
+        "key": "user-id-exists",
+        "serve": {
+          "kind": "boolean",
+          "value": true
+        },
+        "reason": "rule_match",
+        "ruleId": "target"
+      }
+    },
+    {
+      "name": "user-id-not_exists: {}",
+      "key": "user-id-not_exists",
+      "context": {},
+      "expected": {
+        "key": "user-id-not_exists",
+        "serve": {
+          "kind": "boolean",
+          "value": true
+        },
+        "reason": "rule_match",
+        "ruleId": "target"
+      }
+    },
+    {
+      "name": "user-id-not_exists: {'userId': ''}",
+      "key": "user-id-not_exists",
+      "context": {
+        "userId": ""
+      },
+      "expected": {
+        "key": "user-id-not_exists",
+        "serve": {
+          "kind": "boolean",
+          "value": true
+        },
+        "reason": "rule_match",
+        "ruleId": "target"
+      }
+    },
+    {
+      "name": "user-id-not_exists: {'userId': 'usr_present'}",
+      "key": "user-id-not_exists",
+      "context": {
+        "userId": "usr_present"
+      },
+      "expected": {
+        "key": "user-id-not_exists",
+        "serve": {
+          "kind": "boolean",
+          "value": false
+        },
+        "reason": "fallthrough"
+      }
+    },
+    {
+      "name": "user-id-not_exists: {'attributes': {'userId': ''}}",
+      "key": "user-id-not_exists",
+      "context": {
+        "attributes": {
+          "userId": ""
+        }
+      },
+      "expected": {
+        "key": "user-id-not_exists",
+        "serve": {
+          "kind": "boolean",
+          "value": false
+        },
+        "reason": "fallthrough"
+      }
+    }
+  ],
+  "snapshot": {
+    "schemaVersion": 1,
+    "projectId": "p",
+    "environmentId": "e",
+    "environmentKey": "production",
+    "version": 7,
+    "generatedAt": "2026-10-09T00:00:00Z",
+    "flags": {
+      "new-checkout": {
+        "key": "new-checkout",
+        "type": "boolean",
+        "enabled": true,
+        "version": 1,
+        "default": false,
+        "rules": [
+          {
+            "id": "pro-audience",
+            "conditions": [
+              {
+                "kind": "segment",
+                "segmentId": "pro"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          },
+          {
+            "id": "rollout",
+            "conditions": [
+              {
+                "kind": "percentage",
+                "rollout": 35.5
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        }
+      },
+      "search-variant": {
+        "key": "search-variant",
+        "type": "variant",
+        "enabled": true,
+        "version": 1,
+        "default": "control",
+        "rules": [],
+        "fallthrough": {
+          "kind": "weighted",
+          "variations": [
+            {
+              "weight": 20,
+              "serve": {
+                "kind": "variant",
+                "value": "semantic"
+              }
+            },
+            {
+              "weight": 80,
+              "serve": {
+                "kind": "variant",
+                "value": "control"
+              }
+            }
+          ]
+        },
+        "variants": ["control", "semantic"]
+      },
+      "max-retries": {
+        "key": "max-retries",
+        "type": "number",
+        "enabled": true,
+        "version": 1,
+        "default": 3,
+        "rules": [
+          {
+            "id": "group",
+            "conditions": [
+              {
+                "kind": "group",
+                "op": "or",
+                "conditions": [
+                  {
+                    "kind": "attribute",
+                    "attribute": "plan",
+                    "operator": "eq",
+                    "value": "pro"
+                  },
+                  {
+                    "kind": "attribute",
+                    "attribute": "age",
+                    "operator": "gte",
+                    "value": "18"
+                  }
+                ]
+              }
+            ],
+            "serve": {
+              "kind": "number",
+              "value": 7
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "number",
+          "value": 3
+        }
+      },
+      "checkout-payload": {
+        "key": "checkout-payload",
+        "type": "json",
+        "enabled": true,
+        "version": 1,
+        "default": {
+          "mode": "strict"
+        },
+        "rules": [],
+        "fallthrough": {
+          "kind": "json",
+          "value": {
+            "mode": "strict"
+          }
+        }
+      },
+      "disabled": {
+        "key": "disabled",
+        "type": "boolean",
+        "enabled": false,
+        "version": 1,
+        "default": false,
+        "rules": [],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": true
+        }
+      },
+      "operator-21": {
+        "key": "operator-21",
+        "type": "boolean",
+        "enabled": true,
+        "version": 1,
+        "default": false,
+        "rules": [
+          {
+            "id": "match",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "trait",
+                "operator": "eq",
+                "value": 1
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        }
+      },
+      "operator-22": {
+        "key": "operator-22",
+        "type": "boolean",
+        "enabled": true,
+        "version": 1,
+        "default": false,
+        "rules": [
+          {
+            "id": "match",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "trait",
+                "operator": "neq",
+                "value": "free"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        }
+      },
+      "operator-23": {
+        "key": "operator-23",
+        "type": "boolean",
+        "enabled": true,
+        "version": 1,
+        "default": false,
+        "rules": [
+          {
+            "id": "match",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "trait",
+                "operator": "in",
+                "value": ["pro", "free"]
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        }
+      },
+      "operator-24": {
+        "key": "operator-24",
+        "type": "boolean",
+        "enabled": true,
+        "version": 1,
+        "default": false,
+        "rules": [
+          {
+            "id": "match",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "trait",
+                "operator": "not_in",
+                "value": ["pro", "free"]
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        }
+      },
+      "operator-25": {
+        "key": "operator-25",
+        "type": "boolean",
+        "enabled": true,
+        "version": 1,
+        "default": false,
+        "rules": [
+          {
+            "id": "match",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "trait",
+                "operator": "contains",
+                "value": "world"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        }
+      },
+      "operator-26": {
+        "key": "operator-26",
+        "type": "boolean",
+        "enabled": true,
+        "version": 1,
+        "default": false,
+        "rules": [
+          {
+            "id": "match",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "trait",
+                "operator": "startsWith",
+                "value": "he"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        }
+      },
+      "operator-27": {
+        "key": "operator-27",
+        "type": "boolean",
+        "enabled": true,
+        "version": 1,
+        "default": false,
+        "rules": [
+          {
+            "id": "match",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "trait",
+                "operator": "endsWith",
+                "value": "lo"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        }
+      },
+      "operator-28": {
+        "key": "operator-28",
+        "type": "boolean",
+        "enabled": true,
+        "version": 1,
+        "default": false,
+        "rules": [
+          {
+            "id": "match",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "trait",
+                "operator": "gt",
+                "value": "18"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        }
+      },
+      "operator-29": {
+        "key": "operator-29",
+        "type": "boolean",
+        "enabled": true,
+        "version": 1,
+        "default": false,
+        "rules": [
+          {
+            "id": "match",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "trait",
+                "operator": "gte",
+                "value": "2026-01-01"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        }
+      },
+      "operator-30": {
+        "key": "operator-30",
+        "type": "boolean",
+        "enabled": true,
+        "version": 1,
+        "default": false,
+        "rules": [
+          {
+            "id": "match",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "trait",
+                "operator": "lt",
+                "value": true
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        }
+      },
+      "operator-31": {
+        "key": "operator-31",
+        "type": "boolean",
+        "enabled": true,
+        "version": 1,
+        "default": false,
+        "rules": [
+          {
+            "id": "match",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "trait",
+                "operator": "lte",
+                "value": "a"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        }
+      },
+      "operator-32": {
+        "key": "operator-32",
+        "type": "boolean",
+        "enabled": true,
+        "version": 1,
+        "default": false,
+        "rules": [
+          {
+            "id": "match",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "trait",
+                "operator": "exists"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        }
+      },
+      "operator-33": {
+        "key": "operator-33",
+        "type": "boolean",
+        "enabled": true,
+        "version": 1,
+        "default": false,
+        "rules": [
+          {
+            "id": "match",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "trait",
+                "operator": "not_exists"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        }
+      },
+      "operator-34": {
+        "key": "operator-34",
+        "type": "boolean",
+        "enabled": true,
+        "version": 1,
+        "default": false,
+        "rules": [
+          {
+            "id": "match",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "trait",
+                "operator": "eq",
+                "value": "TRUE"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        }
+      },
+      "operator-35": {
+        "key": "operator-35",
+        "type": "boolean",
+        "enabled": true,
+        "version": 1,
+        "default": false,
+        "rules": [
+          {
+            "id": "match",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "trait",
+                "operator": "eq",
+                "value": 16
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        }
+      },
+      "operator-36": {
+        "key": "operator-36",
+        "type": "boolean",
+        "enabled": true,
+        "version": 1,
+        "default": false,
+        "rules": [
+          {
+            "id": "match",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "trait",
+                "operator": "eq",
+                "value": "null"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        }
+      },
+      "operator-37": {
+        "key": "operator-37",
+        "type": "boolean",
+        "enabled": true,
+        "version": 1,
+        "default": false,
+        "rules": [
+          {
+            "id": "match",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "trait",
+                "operator": "gte",
+                "value": "2026-01-02"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        }
+      },
+      "operator-38": {
+        "key": "operator-38",
+        "type": "boolean",
+        "enabled": true,
+        "version": 1,
+        "default": false,
+        "rules": [
+          {
+            "id": "match",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "trait",
+                "operator": "eq",
+                "value": "01"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        }
+      },
+      "operator-39": {
+        "key": "operator-39",
+        "type": "boolean",
+        "enabled": true,
+        "version": 1,
+        "default": false,
+        "rules": [
+          {
+            "id": "match",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "trait",
+                "operator": "contains",
+                "value": "e+21"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        }
+      },
+      "cycle": {
+        "key": "cycle",
+        "type": "boolean",
+        "enabled": true,
+        "version": 1,
+        "default": false,
+        "rules": [
+          {
+            "id": "cycle",
+            "conditions": [
+              {
+                "kind": "segment",
+                "segmentId": "cycle"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        }
+      },
+      "skip-weighted": {
+        "key": "skip-weighted",
+        "type": "variant",
+        "enabled": true,
+        "version": 1,
+        "default": "control",
+        "rules": [
+          {
+            "id": "missing-unit",
+            "conditions": [
+              {
+                "kind": "always"
+              }
+            ],
+            "serve": {
+              "kind": "weighted",
+              "variations": [
+                {
+                  "weight": 20,
+                  "serve": {
+                    "kind": "variant",
+                    "value": "semantic"
+                  }
+                },
+                {
+                  "weight": 80,
+                  "serve": {
+                    "kind": "variant",
+                    "value": "control"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "id": "next-rule",
+            "conditions": [
+              {
+                "kind": "always"
+              }
+            ],
+            "serve": {
+              "kind": "variant",
+              "value": "semantic"
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "variant",
+          "value": "control"
+        },
+        "variants": ["control", "semantic"]
+      },
+      "custom-bucket": {
+        "key": "custom-bucket",
+        "type": "boolean",
+        "enabled": true,
+        "version": 1,
+        "default": false,
+        "rules": [
+          {
+            "id": "seed",
+            "conditions": [
+              {
+                "kind": "percentage",
+                "rollout": 50,
+                "seed": "shared",
+                "attribute": "accountId"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        }
+      },
+      "number-literal": {
+        "key": "number-literal",
+        "type": "boolean",
+        "enabled": true,
+        "version": 1,
+        "default": false,
+        "rules": [
+          {
+            "id": "match",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "trait",
+                "operator": "gt",
+                "value": "9"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        }
+      },
+      "number-negative": {
+        "key": "number-negative",
+        "type": "boolean",
+        "enabled": true,
+        "version": 1,
+        "default": false,
+        "rules": [
+          {
+            "id": "match",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "trait",
+                "operator": "gt",
+                "value": "-1"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        }
+      },
+      "number-trim": {
+        "key": "number-trim",
+        "type": "boolean",
+        "enabled": true,
+        "version": 1,
+        "default": false,
+        "rules": [
+          {
+            "id": "match",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "trait",
+                "operator": "eq",
+                "value": 5
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        }
+      },
+      "timestamp-gt": {
+        "key": "timestamp-gt",
+        "type": "boolean",
+        "enabled": true,
+        "version": 1,
+        "default": false,
+        "rules": [
+          {
+            "id": "match",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "at",
+                "operator": "gt",
+                "value": "2026-01-02T10:00:00Z"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        }
+      },
+      "timestamp-lt": {
+        "key": "timestamp-lt",
+        "type": "boolean",
+        "enabled": true,
+        "version": 1,
+        "default": false,
+        "rules": [
+          {
+            "id": "match",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "at",
+                "operator": "lt",
+                "value": "2026-03-01"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        }
+      },
+      "and-group": {
+        "key": "and-group",
+        "type": "boolean",
+        "enabled": true,
+        "version": 1,
+        "default": false,
+        "rules": [
+          {
+            "id": "target",
+            "conditions": [
+              {
+                "kind": "group",
+                "op": "and",
+                "conditions": [
+                  {
+                    "kind": "attribute",
+                    "attribute": "plan",
+                    "operator": "eq",
+                    "value": "pro"
+                  },
+                  {
+                    "kind": "attribute",
+                    "attribute": "age",
+                    "operator": "gte",
+                    "value": 18
+                  }
+                ]
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        }
+      },
+      "legacy-flat": {
+        "key": "legacy-flat",
+        "type": "boolean",
+        "enabled": true,
+        "version": 1,
+        "default": false,
+        "rules": [
+          {
+            "id": "target",
+            "kind": "attribute",
+            "attribute": "plan",
+            "operator": "eq",
+            "value": "pro",
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        }
+      },
+      "rollout-0": {
+        "key": "rollout-0",
+        "type": "boolean",
+        "enabled": true,
+        "version": 1,
+        "default": false,
+        "rules": [
+          {
+            "id": "target",
+            "conditions": [
+              {
+                "kind": "percentage",
+                "rollout": 0
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        }
+      },
+      "rollout-100": {
+        "key": "rollout-100",
+        "type": "boolean",
+        "enabled": true,
+        "version": 1,
+        "default": false,
+        "rules": [
+          {
+            "id": "target",
+            "conditions": [
+              {
+                "kind": "percentage",
+                "rollout": 100
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        }
+      },
+      "user-id-eq": {
+        "key": "user-id-eq",
+        "type": "boolean",
+        "enabled": true,
+        "version": 1,
+        "default": false,
+        "rules": [
+          {
+            "id": "target",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "userId",
+                "operator": "eq",
+                "value": ""
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        }
+      },
+      "user-id-neq": {
+        "key": "user-id-neq",
+        "type": "boolean",
+        "enabled": true,
+        "version": 1,
+        "default": false,
+        "rules": [
+          {
+            "id": "target",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "userId",
+                "operator": "neq",
+                "value": ""
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        }
+      },
+      "user-id-exists": {
+        "key": "user-id-exists",
+        "type": "boolean",
+        "enabled": true,
+        "version": 1,
+        "default": false,
+        "rules": [
+          {
+            "id": "target",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "userId",
+                "operator": "exists"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        }
+      },
+      "user-id-not_exists": {
+        "key": "user-id-not_exists",
+        "type": "boolean",
+        "enabled": true,
+        "version": 1,
+        "default": false,
+        "rules": [
+          {
+            "id": "target",
+            "conditions": [
+              {
+                "kind": "attribute",
+                "attribute": "userId",
+                "operator": "not_exists"
+              }
+            ],
+            "serve": {
+              "kind": "boolean",
+              "value": true
+            }
+          }
+        ],
+        "fallthrough": {
+          "kind": "boolean",
+          "value": false
+        }
+      }
+    },
+    "segments": {
+      "pro": {
+        "id": "pro",
+        "conditions": [
+          {
+            "kind": "attribute",
+            "attribute": "plan",
+            "operator": "eq",
+            "value": "pro"
+          }
+        ]
+      },
+      "cycle": {
+        "id": "cycle",
+        "conditions": [
+          {
+            "kind": "segment",
+            "segmentId": "cycle"
+          }
+        ]
+      }
+    }
+  }
+}
