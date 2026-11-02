@@ -169,25 +169,3 @@ when required fields are nil; it preserves explicit `false`, `0`, and empty stri
 See the [Go SDK guide](https://docs.useshipd.com/sdks/go),
 [configuration examples](https://docs.useshipd.com/reference/config#targeting-in-code),
 and [sync conflict guide](https://docs.useshipd.com/config-as-code/conflicts).
-
-## Development and releases
-
-Run the checks from this repository's root:
-
-```sh
-go vet ./...
-go test -race ./...
-(cd examples/config && go test -race ./...)
-go test -run='^$' -bench='^BenchmarkFlagEvaluation$' -benchtime=1x
-```
-
-The SDK is released independently with semantic version tags at the repository
-root. After committing and pushing a release, publish its tag (for example):
-
-```sh
-git tag v0.1.0
-git push origin v0.1.0
-GOPROXY=https://proxy.golang.org go list -m github.com/alasti-company/shipd-go@v0.1.0
-```
-
-Published tags are immutable; release fixes under a new version.
