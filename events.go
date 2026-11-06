@@ -204,8 +204,9 @@ func batchBody(events []json.RawMessage) []byte {
 	return b.Bytes()
 }
 
-// jsonStringSize measures encoding/json's string escaping without allocating
-// a serialized event. Invalid UTF-8 and HTML-sensitive runes are escaped too.
+// jsonStringSize bounds encoding/json's string escaping without allocating
+// a serialized event. Invalid UTF-8 uses a conservative six-byte replacement
+// bound, covering encoders that emit either \ufffd or its three UTF-8 bytes.
 func jsonStringSize(s string) int {
 	size := 2 // quotes
 	for len(s) > 0 {

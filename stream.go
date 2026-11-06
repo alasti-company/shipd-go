@@ -95,6 +95,22 @@ func (c *Client) streamHTTPClient() *http.Client {
 	return &http.Client{Transport: streamTransport{client: c.http}, CheckRedirect: func(_ *http.Request, _ []*http.Request) error { return http.ErrUseLastResponse }}
 }
 
+func (c *Client) dialStream(ticket string) (*websocket.Conn, bool, error) {
+	endpoint, err := streamURL(c.options.Overrides.StreamEndpoint, ticket)
+	if err != nil {
+		return nil, false, err
+	}
+	ctx, cancel := c.requestContext(c.ctx)
+	defer cancel()
+	conn, response, err := websocket.Dial(ctx, endpoint, &websocket.DialOptions{HTTPClient: c.streamHTTPClient()})
+	if err != nil {
+		rejected := response != nil && (response.StatusCode == http.StatusUnauthorized || response.StatusCode == http.StatusForbidden)
+		// Dial errors can contain the ticket URL. Never expose that credential.
+		return nil, rejected, errors.New("shipd: stream connection failed")
+	}
+	return conn, false, nil
+}
+
 func (c *Client) runStream() {
 	defer close(c.streamDone)
 	attempt := 0
@@ -107,14 +123,13 @@ func (c *Client) runStream() {
 			ticket, expiry, err = c.mintTicket()
 		}
 		if err == nil && c.ctx.Err() == nil {
-			endpoint, _ := streamURL(c.options.Overrides.StreamEndpoint, ticket)
-			dialCtx, cancel := c.requestContext(c.ctx)
-			opts := &websocket.DialOptions{HTTPClient: c.streamHTTPClient()}
-			conn, _, dialErr := websocket.Dial(dialCtx, endpoint, opts)
-			cancel()
+			conn, rejected, dialErr := c.dialStream(ticket)
 			if dialErr != nil {
-				// Dial errors can contain the ticket URL. Never expose that credential.
-				err = errors.New("shipd: stream connection failed")
+				err = dialErr
+				if rejected {
+					terminalAuth = true
+					ticket = ""
+				}
 			} else {
 				err = c.readStream(conn, func() { attempt = 0; terminalAuth = false })
 				var closeErr websocket.CloseError

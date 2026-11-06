@@ -10,6 +10,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	_ "time/tzdata" // Keep automatic timezone traits valid in minimal containers.
 )
 
 func copyContext(ctx EvaluationContext) EvaluationContext {
@@ -73,20 +74,20 @@ func (c *Client) Subscribe(listener func()) func() {
 	return func() { once.Do(func() { c.mu.Lock(); delete(c.listeners, id); c.mu.Unlock() }) }
 }
 func safeCallback(fn func()) { defer func() { _ = recover() }(); fn() }
-func (c *Client) changed() {
-	c.mu.Lock()
-	if c.closed {
-		c.mu.Unlock()
-		return
-	}
+
+// changeLocked publishes the new generation atomically with the state that it
+// describes. Delivery runs after unlocking and must not wait for cache I/O.
+func (c *Client) changeLocked() []func() {
 	c.revision++
 	listeners := make([]func(), 0, len(c.listeners))
-	for _, f := range c.listeners {
-		listeners = append(listeners, f)
+	for _, listener := range c.listeners {
+		listeners = append(listeners, listener)
 	}
-	c.mu.Unlock()
-	for _, f := range listeners {
-		safeCallback(f)
+	return listeners
+}
+func notifyListeners(listeners []func()) {
+	for _, listener := range listeners {
+		safeCallback(listener)
 	}
 }
 
@@ -167,8 +168,13 @@ func (c *Client) applySnapshot(next *snapshot, data []byte, etag string, ctx con
 	c.snapshot = next
 	c.etag = etag
 	savedETag := c.etag
+	var listeners []func()
+	if previous == nil || *previous != next.Version {
+		listeners = c.changeLocked()
+	}
 	c.readyOnce.Do(func() { close(c.ready) })
 	c.mu.Unlock()
+	notifyListeners(listeners)
 	if previous != nil && *previous != next.Version {
 		c.record(map[string]any{"type": "version_skew", "previousVersion": *previous, "currentVersion": next.Version})
 	}
@@ -176,9 +182,6 @@ func (c *Client) applySnapshot(next *snapshot, data []byte, etag string, ctx con
 		if err := c.options.Cache.Save(ctx, CachedSnapshot{Snapshot: append([]byte(nil), data...), ETag: savedETag}); err != nil {
 			c.reportError(fmt.Errorf("shipd: cache save: %w", err), true)
 		}
-	}
-	if previous == nil || *previous != next.Version {
-		c.changed()
 	}
 }
 
@@ -282,10 +285,15 @@ func (c *Client) applyAutomaticHeader(header string) {
 		incoming[k] = v
 	}
 	c.mu.Lock()
-	changed := !reflect.DeepEqual(c.automatic, incoming)
-	c.automatic = incoming
-	c.mu.Unlock()
-	if changed {
-		c.changed()
+	if c.closed {
+		c.mu.Unlock()
+		return
 	}
+	var listeners []func()
+	if !reflect.DeepEqual(c.automatic, incoming) {
+		c.automatic = incoming
+		listeners = c.changeLocked()
+	}
+	c.mu.Unlock()
+	notifyListeners(listeners)
 }

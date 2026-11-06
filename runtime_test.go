@@ -503,3 +503,84 @@ func TestStreamUsesCustomHTTPClientAndTimeoutPolicy(t *testing.T) {
 		})
 	}
 }
+
+type gatedSnapshotCache struct {
+	memoryCache
+	entered chan struct{}
+	release chan struct{}
+}
+
+func (cache *gatedSnapshotCache) Save(ctx context.Context, data CachedSnapshot) error {
+	snapshot, err := parseSnapshot(data.Snapshot)
+	if err != nil {
+		return err
+	}
+	if snapshot.Version == 2 {
+		close(cache.entered)
+		select {
+		case <-cache.release:
+		case <-ctx.Done():
+			return ctx.Err()
+		}
+	}
+	return cache.memoryCache.Save(ctx, data)
+}
+func TestSnapshotRevisionAndSubscribersDoNotWaitForCache(t *testing.T) {
+	cache := &gatedSnapshotCache{entered: make(chan struct{}), release: make(chan struct{})}
+	var requests atomic.Int32
+	c, _ := newTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		version := requests.Add(1)
+		fmt.Fprint(w, wire(int(version), version == 1))
+	}, Options{Cache: cache, DisableEvents: true})
+	waitReady(t, c)
+	var notified atomic.Int32
+	c.Subscribe(func() {
+		if c.Revision() != 2 || c.IsEnabled("new-checkout", EvaluationContext{}) {
+			t.Error("subscriber observed inconsistent state")
+		}
+		notified.Add(1)
+	})
+	done := make(chan error, 1)
+	go func() { done <- c.Refresh(context.Background()) }()
+	defer func() {
+		close(cache.release)
+		if err := <-done; err != nil {
+			t.Error(err)
+		}
+	}()
+	select {
+	case <-cache.entered:
+	case <-time.After(5 * time.Second):
+		t.Fatal("cache save was not reached")
+	}
+	if c.Revision() != 2 || c.IsEnabled("new-checkout", EvaluationContext{}) || notified.Load() != 1 {
+		t.Fatal("state publication waited for cache I/O")
+	}
+}
+func TestStreamHandshakeAuthenticationRejections(t *testing.T) {
+	for _, status := range []int{http.StatusUnauthorized, http.StatusForbidden, http.StatusServiceUnavailable} {
+		t.Run(fmt.Sprint(status), func(t *testing.T) {
+			gateway := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { w.WriteHeader(status) }))
+			defer gateway.Close()
+			c := &Client{ctx: context.Background(), http: gateway.Client(), options: Options{FetchTimeout: time.Second, Overrides: Overrides{StreamEndpoint: gateway.URL}}}
+			conn, rejected, err := c.dialStream("secret-ticket")
+			if conn != nil || err == nil || strings.Contains(err.Error(), "secret-ticket") {
+				t.Fatalf("unexpected dial outcome: conn=%v err=%v", conn, err)
+			}
+			want := status == http.StatusUnauthorized || status == http.StatusForbidden
+			if rejected != want {
+				t.Fatalf("auth rejection=%v for HTTP %d", rejected, status)
+			}
+		})
+	}
+}
+func TestAutomaticTimezoneTraits(t *testing.T) {
+	for _, zone := range []string{"America/Los_Angeles", "Europe/Berlin", "Asia/Kolkata", "UTC"} {
+		if got := automaticTraits(map[string]string{"timezone": zone})["timezone"]; got != zone {
+			t.Fatalf("timezone %s normalized to %v", zone, got)
+		}
+	}
+	if _, ok := automaticTraits(map[string]string{"timezone": "Invalid/Zone"})["timezone"]; ok {
+		t.Fatal("invalid timezone accepted")
+	}
+}

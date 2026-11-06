@@ -59,6 +59,8 @@ covered below, rather than proving equivalence for every possible input.
   persistence/rotation, localStorage adapters, remote value evaluation, and
   `shipdit/client/react` providers/hooks have no Go server counterpart. The server
   does not identify a mutable global user or download remote identity overlays.
+- Automatic timezone validation embeds the standard library's `time/tzdata`,
+  so valid zones work in minimal containers without system zoneinfo.
 - The Go package version tracks its own releases, independently of npm's version.
 - Go keeps stricter telemetry payload handling: oversized evaluation values can
   be omitted while their attribution is retained; invalid identify payloads return

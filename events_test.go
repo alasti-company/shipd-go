@@ -11,6 +11,7 @@ import (
 	"sync/atomic"
 	"testing"
 	"time"
+	"unicode/utf8"
 )
 
 func TestFlushSingleEventByteBoundary(t *testing.T) {
@@ -164,7 +165,7 @@ func TestFlushAndShutdownDeadlineWhileBackgroundFlushRuns(t *testing.T) {
 	}
 }
 
-func TestJSONStringSizeMatchesEncoder(t *testing.T) {
+func TestJSONStringSizeBoundsEncoder(t *testing.T) {
 	values := []string{"", "plain", "用户😀", "\"\\\b\f\n\r\t\x00\x1f<>&\u2028\u2029", string([]byte{0xff, 0xfe, 0xc0}), "\ufffd"}
 	for i := 0; i < 256; i++ {
 		values = append(values, string([]byte{byte(i)}))
@@ -174,8 +175,8 @@ func TestJSONStringSizeMatchesEncoder(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		if got := jsonStringSize(value); got != len(encoded) {
-			t.Fatalf("%q size %d, want %d", value, got, len(encoded))
+		if got := jsonStringSize(value); got < len(encoded) || (utf8.ValidString(value) && got != len(encoded)) {
+			t.Fatalf("%q size bound %d, encoded size %d", value, got, len(encoded))
 		}
 	}
 	if allocations := testing.AllocsPerRun(100, func() { _ = jsonStringSize(values[3]) }); allocations != 0 {
