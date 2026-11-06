@@ -8,14 +8,16 @@ import (
 	"fmt"
 	"net/http"
 	"time"
+	"unicode/utf8"
 )
 
 // Identity is sent to shipd for audience insights. It does not set a global
 // evaluation context; server applications pass context separately per request.
 type Identity struct {
-	UserID string
-	Name   string
-	Traits map[string]any
+	UserID      string
+	AnonymousID string
+	Name        string
+	Traits      map[string]any
 }
 
 // Identify queues an identify event. Flush delivers it. Traits must be scalar
@@ -26,6 +28,8 @@ func (c *Client) Identify(identity Identity) error {
 		return errors.New("shipd: identify requires UserID")
 	case !boundedString(identity.UserID, 256, true):
 		return errors.New("shipd: identify UserID exceeds 256 characters")
+	case !boundedString(identity.AnonymousID, 256, false):
+		return errors.New("shipd: identify AnonymousID exceeds 256 characters")
 	case !boundedString(identity.Name, 256, false):
 		return errors.New("shipd: identify Name exceeds 256 characters")
 	case len(identity.Traits) > 100:
@@ -54,6 +58,9 @@ func (c *Client) Identify(identity Identity) error {
 		return ErrClosed
 	}
 	event := map[string]any{"type": "identify", "userId": identity.UserID, "name": identity.Name, "traits": traits, "snapshotVersion": version}
+	if identity.AnonymousID != "" {
+		event["anonymousId"] = identity.AnonymousID
+	}
 	if data, _ := json.Marshal(event); len(data) > maxEventBytes {
 		return fmt.Errorf("shipd: identify event exceeds payload limit")
 	}
@@ -138,6 +145,11 @@ func (c *Client) Flush(ctx context.Context) (err error) {
 	c.events = nil
 	c.mu.Unlock()
 	defer func() {
+		defer func() {
+			if err != nil {
+				c.reportError(err, false)
+			}
+		}()
 		c.mu.Lock()
 		defer c.mu.Unlock()
 		c.lastError = err
@@ -192,7 +204,53 @@ func batchBody(events []json.RawMessage) []byte {
 	return b.Bytes()
 }
 
+// jsonStringSize bounds encoding/json's string escaping without allocating
+// a serialized event. Invalid UTF-8 uses a conservative six-byte replacement
+// bound, covering encoders that emit either \ufffd or its three UTF-8 bytes.
+func jsonStringSize(s string) int {
+	size := 2 // quotes
+	for len(s) > 0 {
+		b := s[0]
+		if b < utf8.RuneSelf {
+			switch b {
+			case '"', '\\', '\b', '\f', '\n', '\r', '\t':
+				size += 2
+			case '<', '>', '&':
+				size += 6
+			default:
+				if b < 0x20 {
+					size += 6
+				} else {
+					size++
+				}
+			}
+			s = s[1:]
+			continue
+		}
+		r, n := utf8.DecodeRuneInString(s)
+		if r == '\u2028' || r == '\u2029' || r == utf8.RuneError && n == 1 {
+			size += 6
+		} else {
+			size += n
+		}
+		s = s[n:]
+	}
+	return size
+}
+
 func needsSizeCheck(event map[string]any) bool {
+	overhead := eventOverheadBytes
+	if traits, ok := event["traits"].(map[string]any); ok {
+		for key, value := range traits {
+			overhead += jsonStringSize(key) + 64
+			if s, ok := value.(string); ok {
+				overhead += jsonStringSize(s)
+			}
+		}
+		if overhead > maxEventBytes {
+			return true
+		}
+	}
 	if event["type"] != "evaluation" {
 		return event["type"] != "unregistered_flag"
 	}
@@ -200,7 +258,7 @@ func needsSizeCheck(event map[string]any) bool {
 	case string:
 		// JSON escaping grows a byte to at most 6 ("\u00XX"), and the rest of the
 		// event is bounded by the 256-character key, user ID, and rule ID checks.
-		return 6*len(value)+eventOverheadBytes > maxEventBytes
+		return 6*len(value)+overhead > maxEventBytes
 	case map[string]any, []any:
 		return true
 	}

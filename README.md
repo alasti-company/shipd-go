@@ -1,6 +1,6 @@
 # shipd Go SDK
 
-A Go 1.23+ server SDK with no external dependencies. Evaluates flags locally from
+A Go 1.23+ server SDK. Streaming uses `github.com/coder/websocket`. Evaluates flags locally from
 an environment snapshot. One client is safe to share across goroutines; pass an
 evaluation context for each request.
 
@@ -71,7 +71,13 @@ func main() {
 - Malformed snapshots and unsupported schema versions are rejected as a whole.
   Delayed responses never replace a snapshot with a lower version.
 - JSON results are detached from client state; decoded numbers are `float64`.
-- This release uses polling. It has no WebSocket stream, disk cache, remote identity overlay lookup. Supply traits per request.
+- Optional ticket-authenticated WebSocket updates (`Stream: true`) retain polling
+  as a fallback and retry when the HTTP snapshot lags a notification.
+- Optional durable snapshot cache (`SnapshotCache`) supports offline starts and ETags.
+- Default `Context` merges below per-call attributes; explicitly empty `SegmentIDs`
+  replaces default audiences. `UserIDPresent` permits an explicitly empty user ID.
+- `Revision` and `Subscribe` expose snapshot changes. `Identify` records telemetry
+  without changing the evaluation identity on this shared server client.
 
 `Evaluate` returns `Result` with `Value`, `Reason`, `RuleID`, and
 `SnapshotVersion`. Evaluation continues to work after `Close` using the last
@@ -87,6 +93,15 @@ polling keeps trying unless disabled.
 | `SDKKey`          | Required server SDK key                                            |
 | `Defaults`        | JSON-compatible values by flag key; copied on construction         |
 | `RefreshInterval` | `30 * time.Second`; zero selects default                           |
+| `ReadyTimeout`     | `5 * time.Second`; negative returns immediately with defaults      |
+| `Context`          | Default evaluation context; per-call values win                    |
+| `Cache`            | Optional `SnapshotCache` adapter with `Load` and `Save`             |
+| `Stream`           | `false`; enable WebSocket updates using short-lived edge tickets   |
+| `OnError`          | Callback for fetch, stream, cache, and event delivery errors        |
+| `AnonymousID`      | Optional anonymous correlation ID sent with evaluation events      |
+| `AutomaticTraits`  | `false`; opt into edge location traits under explicit context      |
+| `AutomaticTraitSeed` | Location trait seed above edge traits, below explicit context    |
+| `DisableFetchTimeout` | `false`; disable per-request timeout, retaining context deadlines |
 | `FetchTimeout`    | `10 * time.Second`; bounds the whole request, including body reads |
 | `DisablePolling`  | `false`; initial fetch still runs; use `Refresh(ctx)` manually     |
 | `DisableEvents`   | `false`; disables evaluation and identify telemetry                |
@@ -95,6 +110,10 @@ polling keeps trying unless disabled.
 | `Bootstrap`       | Snapshot JSON served until a newer fetch; client is ready at once  |
 | `Overrides`       | `UnsafeEndpoint` replaces the edge; dev/test only (gets SDK key)   |
 | `HTTPClient`      | Optional custom `Do(*http.Request)` implementation                 |
+
+`Overrides.StreamEndpoint` defaults to `https://ws.useshipd.com`; development
+and tests can supply an HTTP(S) or WS(S) gateway URL. The SDK key is used only to
+mint tickets over HTTP; the WebSocket receives the short-lived ticket.
 
 The default HTTP client rejects redirects. Custom HTTP clients control their own
 redirect behavior. No automatic geographic traits are inferred for server keys.
@@ -106,8 +125,9 @@ events are buffered. The buffer retains at most 200 entries, dropping oldest
 entries on overflow (`DroppedEvents` counts them); failed batches are retried on
 the next interval. `SnapshotVersion` reports the loaded version without recording
 an event.
-Events carry flag values, user IDs, reasons, and snapshot versions. Evaluation
-attributes are never included. Set `DisableEvents: true` to disable telemetry.
+Events carry flag values, user IDs, reasons, snapshot versions, anonymous
+correlation IDs, and up to 100 scalar evaluation traits. Diagnostic events also
+report errors, version changes, and fetch/propagation timings. Set `DisableEvents: true` to disable telemetry.
 
 `Identify` queues identity traits for shipd audience insights; it does not change
 the context used for evaluation:
@@ -169,3 +189,14 @@ when required fields are nil; it preserves explicit `false`, `0`, and empty stri
 See the [Go SDK guide](https://docs.useshipd.com/sdks/go),
 [configuration examples](https://docs.useshipd.com/reference/config#targeting-in-code),
 and [sync conflict guide](https://docs.useshipd.com/config-as-code/conflicts).
+
+## TypeScript parity
+
+See [PARITY.md](PARITY.md) for the `shipdit@0.6.0` server feature map, API
+conventions, browser-only exclusions, and reproducible cross-language checks.
+
+`Subscribe` and `OnError` callbacks run outside the state mutex and may evaluate
+flags. Return promptly; do not call blocking lifecycle methods (`Refresh`,
+`Flush`, `Close`, `Shutdown`) from callbacks. Callback panics are contained.
+Cache adapters must honor context cancellation and should namespace storage by
+SDK key and edge endpoint so environments never share a cache entry.

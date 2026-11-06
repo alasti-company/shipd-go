@@ -11,6 +11,7 @@ import (
 	"sync/atomic"
 	"testing"
 	"time"
+	"unicode/utf8"
 )
 
 func TestFlushSingleEventByteBoundary(t *testing.T) {
@@ -101,6 +102,9 @@ func TestEmptyFlushClearsLastError(t *testing.T) {
 			if err := c.Ready(ctx); err == nil || c.LastError() == nil {
 				t.Fatal("expected initial fetch failure")
 			}
+			c.mu.Lock()
+			c.events = nil
+			c.mu.Unlock() // This test exercises an empty flush after fetch diagnostics.
 			if err := c.Flush(ctx); err != nil {
 				t.Fatal(err)
 			}
@@ -158,5 +162,40 @@ func TestFlushAndShutdownDeadlineWhileBackgroundFlushRuns(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+func TestJSONStringSizeBoundsEncoder(t *testing.T) {
+	values := []string{"", "plain", "用户😀", "\"\\\b\f\n\r\t\x00\x1f<>&\u2028\u2029", string([]byte{0xff, 0xfe, 0xc0}), "\ufffd"}
+	for i := 0; i < 256; i++ {
+		values = append(values, string([]byte{byte(i)}))
+	}
+	for _, value := range values {
+		encoded, err := json.Marshal(value)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if got := jsonStringSize(value); got < len(encoded) || (utf8.ValidString(value) && got != len(encoded)) {
+			t.Fatalf("%q size bound %d, encoded size %d", value, got, len(encoded))
+		}
+	}
+	if allocations := testing.AllocsPerRun(100, func() { _ = jsonStringSize(values[3]) }); allocations != 0 {
+		t.Fatalf("size measurement allocated %v", allocations)
+	}
+}
+func TestLargeTraitContextAvoidsEventSerialization(t *testing.T) {
+	traits := map[string]any{}
+	for i := 0; i < 100; i++ {
+		traits[fmt.Sprint(i)] = strings.Repeat("x", 1024)
+	}
+	event := map[string]any{"type": "evaluation", "value": true, "traits": traits}
+	if needsSizeCheck(event) {
+		t.Fatal("plain trait strings below the limit should not require event serialization")
+	}
+	for key := range traits {
+		traits[key] = strings.Repeat("\x00", 1024)
+	}
+	if !needsSizeCheck(event) {
+		t.Fatal("escaping that exceeds the event limit must require serialization")
 	}
 }

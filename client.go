@@ -2,6 +2,8 @@ package shipd
 
 import (
 	"context"
+	"crypto/rand"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -52,6 +54,11 @@ type Client struct {
 	flushNow     chan struct{}
 	flushFailing bool
 	dropped      uint64
+	revision     uint64
+	listeners    map[uint64]func()
+	nextListener uint64
+	streamDone   chan struct{}
+	automatic    map[string]any
 }
 
 // New starts an initial asynchronous fetch and background polling. Construction
@@ -59,6 +66,9 @@ type Client struct {
 func New(options Options) (*Client, error) {
 	if strings.TrimSpace(options.SDKKey) == "" {
 		return nil, errors.New("shipd: SDKKey is required")
+	}
+	if !boundedString(options.AnonymousID, 256, false) {
+		return nil, errors.New("shipd: AnonymousID exceeds 256 characters")
 	}
 	endpoint := DefaultEndpoint
 	if options.Overrides.UnsafeEndpoint != "" {
@@ -88,8 +98,22 @@ func New(options Options) (*Client, error) {
 	if options.RefreshInterval == 0 {
 		options.RefreshInterval = 30 * time.Second
 	}
+	if options.ReadyTimeout == 0 {
+		options.ReadyTimeout = 5 * time.Second
+	}
 	if options.FetchTimeout == 0 {
 		options.FetchTimeout = 10 * time.Second
+	}
+	options.Context = copyContext(options.Context)
+	seed := make(map[string]string, len(options.AutomaticTraitSeed))
+	for k, v := range options.AutomaticTraitSeed {
+		seed[k] = v
+	}
+	options.AutomaticTraitSeed = seed
+	if options.Stream {
+		if _, err := streamURL(options.Overrides.StreamEndpoint, "validation"); err != nil {
+			return nil, err
+		}
 	}
 	defaults, err := json.Marshal(options.Defaults)
 	if err != nil {
@@ -104,7 +128,7 @@ func New(options Options) (*Client, error) {
 		transport = &http.Client{CheckRedirect: func(_ *http.Request, _ []*http.Request) error { return http.ErrUseLastResponse }}
 	}
 	ctx, cancel := context.WithCancel(context.Background())
-	c := &Client{options: options, endpoint: endpoint, http: transport, ctx: ctx, cancel: cancel, done: make(chan struct{}), ready: make(chan struct{}), attempted: make(chan struct{}), flushNow: make(chan struct{}, 1), flushGate: make(chan struct{}, 1)}
+	c := &Client{options: options, endpoint: endpoint, http: transport, ctx: ctx, cancel: cancel, done: make(chan struct{}), ready: make(chan struct{}), attempted: make(chan struct{}), flushNow: make(chan struct{}, 1), flushGate: make(chan struct{}, 1), listeners: make(map[uint64]func()), streamDone: make(chan struct{}), automatic: automaticTraits(options.AutomaticTraitSeed)}
 	if options.Bootstrap != nil {
 		bootstrap, err := parseSnapshot(options.Bootstrap)
 		if err != nil {
@@ -119,9 +143,15 @@ func New(options Options) (*Client, error) {
 }
 func (c *Client) run() {
 	defer close(c.done)
+	c.loadCache()
 	c.attemptErr = c.Refresh(c.ctx)
 	close(c.attempted)
-	polling := time.NewTicker(c.options.RefreshInterval)
+	if c.options.Stream {
+		go c.runStream()
+	} else {
+		close(c.streamDone)
+	}
+	polling := time.NewTimer(c.options.RefreshInterval)
 	defer polling.Stop()
 	// A negative FlushInterval disables timed flushes; a nil channel never fires.
 	var events <-chan time.Time
@@ -138,6 +168,7 @@ func (c *Client) run() {
 			if !c.options.DisablePolling {
 				_ = c.Refresh(c.ctx)
 			}
+			polling.Reset(c.options.RefreshInterval)
 		case <-events:
 			if !c.options.DisableEvents {
 				_ = c.Flush(c.ctx)
@@ -159,6 +190,11 @@ func (c *Client) run() {
 // attempt fails; evaluation then serves defaults and polling may still recover.
 // A bounded context is recommended.
 func (c *Client) Ready(ctx context.Context) (err error) {
+	if c.options.ReadyTimeout > 0 {
+		var cancel context.CancelFunc
+		ctx, cancel = context.WithTimeout(ctx, c.options.ReadyTimeout)
+		defer cancel()
+	}
 	// Readiness and cancellation may both be signaled; closing takes precedence.
 	defer func() {
 		c.mu.RLock()
@@ -167,6 +203,9 @@ func (c *Client) Ready(ctx context.Context) (err error) {
 			err = ErrClosed
 		}
 	}()
+	if c.options.ReadyTimeout < 0 {
+		return nil
+	}
 	select {
 	case <-c.ready:
 		return nil
@@ -211,8 +250,15 @@ func (c *Client) SnapshotVersion() (version int64, ok bool) {
 // buffer was full, for example while the edge was unreachable.
 func (c *Client) DroppedEvents() uint64 { c.mu.RLock(); defer c.mu.RUnlock(); return c.dropped }
 func (c *Client) setError(err error)    { c.mu.Lock(); c.lastError = err; c.mu.Unlock() }
+func (c *Client) requestContext(ctx context.Context) (context.Context, context.CancelFunc) {
+	if c.options.DisableFetchTimeout {
+		return context.WithCancel(ctx)
+	}
+	return context.WithTimeout(ctx, c.options.FetchTimeout)
+}
+
 func (c *Client) request(ctx context.Context, method, path string, body io.Reader) (*http.Response, error) {
-	requestCtx, cancel := context.WithTimeout(ctx, c.options.FetchTimeout)
+	requestCtx, cancel := c.requestContext(ctx)
 	req, err := http.NewRequestWithContext(requestCtx, method, c.endpoint+path, body)
 	if err != nil {
 		cancel()
@@ -223,10 +269,17 @@ func (c *Client) request(ctx context.Context, method, path string, body io.Reade
 	req.Header.Set("X-Shipd-SDK-Version", SDKVersion)
 	req.Header.Set("X-Shipd-Snapshot-Schema", "1")
 	req.Header.Set("X-Shipd-Control-Plane-API", "1")
+	req.Header.Set("X-Shipd-Stream-Protocol", "1")
+	var correlation [16]byte
+	if _, err := rand.Read(correlation[:]); err == nil {
+		id := hex.EncodeToString(correlation[:])
+		req.Header.Set("X-Request-ID", id)
+		req.Header.Set("X-Correlation-ID", id)
+	}
 	if body != nil {
 		req.Header.Set("Content-Type", "application/json")
 	}
-	if method == http.MethodGet {
+	if method == http.MethodGet && path == "/sdk/v1/snapshot" {
 		c.mu.RLock()
 		etag := c.etag
 		c.mu.RUnlock()
@@ -261,7 +314,14 @@ func (c *Client) Refresh(ctx context.Context) (err error) {
 	if closed {
 		return ErrClosed
 	}
-	defer func() { c.setError(err) }()
+	defer func() {
+		c.setError(err)
+		if err != nil {
+			c.reportError(err, true)
+		}
+	}()
+	started := time.Now()
+	defer func() { c.recordTiming("snapshot_fetch", time.Since(started), nil) }()
 	fetchCtx, cancel := context.WithCancel(ctx)
 	defer cancel()
 	stop := context.AfterFunc(c.ctx, cancel)
@@ -272,6 +332,7 @@ func (c *Client) Refresh(ctx context.Context) (err error) {
 	}
 	defer response.Body.Close()
 	if response.StatusCode == http.StatusNotModified {
+		c.applyAutomaticHeader(response.Header.Get("X-Shipd-Auto-Traits"))
 		c.mu.Lock()
 		defer c.mu.Unlock()
 		if c.snapshot == nil {
@@ -296,27 +357,30 @@ func (c *Client) Refresh(ctx context.Context) (err error) {
 	if err != nil {
 		return err
 	}
-	c.mu.Lock()
-	if !c.closed && (c.snapshot == nil || next.Version >= c.snapshot.Version) {
-		c.snapshot = next
-		c.etag = response.Header.Get("ETag")
-		c.readyOnce.Do(func() { close(c.ready) })
-	}
-	c.mu.Unlock()
+	c.applyAutomaticHeader(response.Header.Get("X-Shipd-Auto-Traits"))
+	c.applySnapshot(next, data, response.Header.Get("ETag"), fetchCtx, true)
 	return nil
 }
 
-// Evaluate returns details and records a bounded diagnostic event. Request
-// attributes remain local; evaluation telemetry includes only the user ID.
+// Evaluate returns details and records a bounded diagnostic event including
+// the user ID and up to 100 scalar traits. DisableEvents suppresses telemetry.
 func (c *Client) Evaluate(key string, ctx EvaluationContext) Result { return c.evaluate(key, ctx, nil) }
 func (c *Client) evaluate(key string, ctx EvaluationContext, fallback any) Result {
 	c.mu.RLock()
 	s := c.snapshot
+	ctx = mergeContext(c.options.Context, ctx)
+	if c.options.AutomaticTraits {
+		ctx = mergeContext(EvaluationContext{Attributes: c.automatic}, ctx)
+	}
 	if v, ok := c.options.Defaults[key]; ok {
 		fallback = v
 	}
 	c.mu.RUnlock()
 	r := evaluate(s, key, ctx, fallback)
+	if c.options.DisableEvents {
+		r.Value = detach(r.Value)
+		return r
+	}
 	var snapshotVersion any
 	if r.SnapshotVersion != nil {
 		snapshotVersion = *r.SnapshotVersion
@@ -324,6 +388,12 @@ func (c *Client) evaluate(key string, ctx EvaluationContext, fallback any) Resul
 	// The event keeps the snapshot or default value, which the client never
 	// mutates; the caller gets its own copy of JSON values and version data.
 	event := map[string]any{"type": "evaluation", "key": key, "reason": r.Reason, "value": r.Value, "snapshotVersion": snapshotVersion}
+	if traits := telemetryTraits(ctx.Attributes); traits != nil {
+		event["traits"] = traits
+	}
+	if c.options.AnonymousID != "" {
+		event["anonymousId"] = c.options.AnonymousID
+	}
 	r.Value = detach(r.Value)
 	if r.RuleID != "" {
 		event["ruleId"] = r.RuleID
@@ -425,6 +495,7 @@ func (c *Client) Shutdown(ctx context.Context) error {
 func (c *Client) Close() error {
 	c.closeOnce.Do(func() { c.mu.Lock(); c.closed = true; c.mu.Unlock(); c.cancel() })
 	<-c.done
+	<-c.streamDone
 	c.refreshMu.Lock()
 	c.refreshMu.Unlock()
 	c.flushGate <- struct{}{}
