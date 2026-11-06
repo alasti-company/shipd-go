@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"time"
+	"unicode/utf8"
 )
 
 // Identity is sent to shipd for audience insights. It does not set a global
@@ -203,13 +204,46 @@ func batchBody(events []json.RawMessage) []byte {
 	return b.Bytes()
 }
 
+// jsonStringSize measures encoding/json's string escaping without allocating
+// a serialized event. Invalid UTF-8 and HTML-sensitive runes are escaped too.
+func jsonStringSize(s string) int {
+	size := 2 // quotes
+	for len(s) > 0 {
+		b := s[0]
+		if b < utf8.RuneSelf {
+			switch b {
+			case '"', '\\', '\b', '\f', '\n', '\r', '\t':
+				size += 2
+			case '<', '>', '&':
+				size += 6
+			default:
+				if b < 0x20 {
+					size += 6
+				} else {
+					size++
+				}
+			}
+			s = s[1:]
+			continue
+		}
+		r, n := utf8.DecodeRuneInString(s)
+		if r == '\u2028' || r == '\u2029' || r == utf8.RuneError && n == 1 {
+			size += 6
+		} else {
+			size += n
+		}
+		s = s[n:]
+	}
+	return size
+}
+
 func needsSizeCheck(event map[string]any) bool {
 	overhead := eventOverheadBytes
 	if traits, ok := event["traits"].(map[string]any); ok {
 		for key, value := range traits {
-			overhead += 6*len(key) + 64
+			overhead += jsonStringSize(key) + 64
 			if s, ok := value.(string); ok {
-				overhead += 6 * len(s)
+				overhead += jsonStringSize(s)
 			}
 		}
 		if overhead > maxEventBytes {

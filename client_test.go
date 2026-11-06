@@ -517,7 +517,7 @@ func TestSnapshotVersion(t *testing.T) {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 	if len(c.events) != 1 || c.events[0]["type"] != "timing" {
-		t.Fatal("SnapshotVersion must not record events")
+		t.Fatalf("SnapshotVersion must leave only the initial snapshot fetch timing event; got %v", c.events)
 	}
 }
 func TestFetchTimeoutAndConfiguration(t *testing.T) {

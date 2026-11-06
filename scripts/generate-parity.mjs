@@ -7,6 +7,10 @@ if (SDK_PACKAGE_VERSION !== '0.6.0') throw new Error(`Expected shipdit 0.6.0, go
 const { snapshot, cases: shared } = JSON.parse(readFileSync(new URL('../testdata/evaluation.json', import.meta.url)));
 const client = createClient({ sdkKey: 'parity-test', events: false, refreshIntervalMs: 0, fetch: async () => Response.json(snapshot) });
 await client.ready();
+if (client.getVersion() !== snapshot.version) {
+ await client.close();
+ throw new Error(`Snapshot failed to load: expected version ${snapshot.version}, got ${client.getVersion()}`);
+}
 const methods = {boolean:'isEnabled',variant:'getVariant',number:'getNumber',json:'getJson'};
 const cases = [];
 const contexts = shared.map(c => c.context);

@@ -165,9 +165,7 @@ func (c *Client) applySnapshot(next *snapshot, data []byte, etag string, ctx con
 		previous = &v
 	}
 	c.snapshot = next
-	if etag != "" {
-		c.etag = etag
-	}
+	c.etag = etag
 	savedETag := c.etag
 	c.readyOnce.Do(func() { close(c.ready) })
 	c.mu.Unlock()

@@ -80,6 +80,21 @@ func waitContext(ctx context.Context, delay time.Duration) bool {
 		return true
 	}
 }
+
+// websocket.Dial requires *http.Client. Preserve arbitrary configured Do
+// implementations through a transport adapter instead of bypassing them.
+type streamTransport struct{ client HTTPClient }
+
+func (t streamTransport) RoundTrip(request *http.Request) (*http.Response, error) {
+	return t.client.Do(request)
+}
+func (c *Client) streamHTTPClient() *http.Client {
+	if client, ok := c.http.(*http.Client); ok {
+		return client
+	}
+	return &http.Client{Transport: streamTransport{client: c.http}, CheckRedirect: func(_ *http.Request, _ []*http.Request) error { return http.ErrUseLastResponse }}
+}
+
 func (c *Client) runStream() {
 	defer close(c.streamDone)
 	attempt := 0
@@ -93,11 +108,8 @@ func (c *Client) runStream() {
 		}
 		if err == nil && c.ctx.Err() == nil {
 			endpoint, _ := streamURL(c.options.Overrides.StreamEndpoint, ticket)
-			dialCtx, cancel := context.WithTimeout(c.ctx, c.options.FetchTimeout)
-			opts := &websocket.DialOptions{}
-			if client, ok := c.http.(*http.Client); ok {
-				opts.HTTPClient = client
-			}
+			dialCtx, cancel := c.requestContext(c.ctx)
+			opts := &websocket.DialOptions{HTTPClient: c.streamHTTPClient()}
 			conn, _, dialErr := websocket.Dial(dialCtx, endpoint, opts)
 			cancel()
 			if dialErr != nil {
@@ -172,7 +184,7 @@ func (c *Client) readStream(conn *websocket.Conn, connected func()) error {
 			if v, ok := c.SnapshotVersion(); ok {
 				subscribe["lastKnownVersion"] = v
 			}
-			ctx, cancel := context.WithTimeout(c.ctx, c.options.FetchTimeout)
+			ctx, cancel := c.requestContext(c.ctx)
 			err := wsjson.Write(ctx, conn, subscribe)
 			cancel()
 			if err != nil {

@@ -413,3 +413,93 @@ func TestStreamForcedResyncAndProtocolRejection(t *testing.T) {
 		t.Fatalf("forced resync failed: version=%d fetches=%d", v, snapshots.Load())
 	}
 }
+
+func TestSnapshotWithoutETagClearsPreviousValidator(t *testing.T) {
+	cache := &memoryCache{}
+	var requests atomic.Int32
+	c, _ := newTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		n := requests.Add(1)
+		switch n {
+		case 1:
+			w.Header().Set("ETag", `"one"`)
+		case 2:
+			if r.Header.Get("If-None-Match") != `"one"` {
+				t.Error("missing initial validator")
+			}
+		case 3:
+			if validator := r.Header.Get("If-None-Match"); validator != "" {
+				t.Errorf("stale validator: %s", validator)
+			}
+		}
+		fmt.Fprint(w, wire(int(n), true))
+	}, Options{Cache: cache, DisableEvents: true})
+	waitReady(t, c)
+	if err := c.Refresh(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	cache.mu.Lock()
+	etag := cache.data.ETag
+	cache.mu.Unlock()
+	if etag != "" {
+		t.Fatal("cache retained stale validator", etag)
+	}
+	if err := c.Refresh(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+}
+func TestStreamUsesCustomHTTPClientAndTimeoutPolicy(t *testing.T) {
+	for _, disabled := range []bool{false, true} {
+		t.Run(fmt.Sprint(disabled), func(t *testing.T) {
+			subscribed := make(chan struct{}, 1)
+			gateway := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				conn, err := websocket.Accept(w, r, nil)
+				if err != nil {
+					return
+				}
+				defer conn.CloseNow()
+				ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
+				defer cancel()
+				_ = wsjson.Write(ctx, conn, map[string]any{"protocolVersion": 1, "type": "connected", "connectionId": "c", "environmentId": "e", "snapshotVersion": 1})
+				var message map[string]any
+				if err := wsjson.Read(ctx, conn, &message); err != nil {
+					return
+				}
+				subscribed <- struct{}{}
+				_, _, _ = conn.Read(ctx)
+			}))
+			defer gateway.Close()
+			var handshakes atomic.Int32
+			transport := httpClientFunc(func(r *http.Request) (*http.Response, error) {
+				if strings.EqualFold(r.Header.Get("Upgrade"), "websocket") {
+					handshakes.Add(1)
+					_, hasDeadline := r.Context().Deadline()
+					if hasDeadline == disabled {
+						t.Errorf("handshake deadline=%v, DisableFetchTimeout=%v", hasDeadline, disabled)
+					}
+				}
+				return http.DefaultClient.Do(r)
+			})
+			c, _ := newTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+				if strings.HasSuffix(r.URL.Path, "stream-ticket") {
+					fmt.Fprint(w, `{"ticket":"custom","ttlSeconds":300}`)
+					return
+				}
+				fmt.Fprint(w, wire(1, true))
+			}, Options{Stream: true, DisableFetchTimeout: disabled, HTTPClient: transport, DisableEvents: true, Overrides: Overrides{StreamEndpoint: gateway.URL}})
+			waitReady(t, c)
+			select {
+			case <-subscribed:
+			case <-time.After(5 * time.Second):
+				t.Fatal("custom transport did not establish stream")
+			}
+			if handshakes.Load() != 1 {
+				t.Fatal("custom HTTPClient was bypassed")
+			}
+			ctx, cancel := c.requestContext(c.ctx)
+			defer cancel()
+			if _, hasDeadline := ctx.Deadline(); hasDeadline == disabled {
+				t.Error("subscription context uses incorrect timeout policy")
+			}
+		})
+	}
+}

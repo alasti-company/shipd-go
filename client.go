@@ -250,12 +250,15 @@ func (c *Client) SnapshotVersion() (version int64, ok bool) {
 // buffer was full, for example while the edge was unreachable.
 func (c *Client) DroppedEvents() uint64 { c.mu.RLock(); defer c.mu.RUnlock(); return c.dropped }
 func (c *Client) setError(err error)    { c.mu.Lock(); c.lastError = err; c.mu.Unlock() }
-func (c *Client) request(ctx context.Context, method, path string, body io.Reader) (*http.Response, error) {
-	requestCtx, cancel := context.WithCancel(ctx)
-	if !c.options.DisableFetchTimeout {
-		cancel()
-		requestCtx, cancel = context.WithTimeout(ctx, c.options.FetchTimeout)
+func (c *Client) requestContext(ctx context.Context) (context.Context, context.CancelFunc) {
+	if c.options.DisableFetchTimeout {
+		return context.WithCancel(ctx)
 	}
+	return context.WithTimeout(ctx, c.options.FetchTimeout)
+}
+
+func (c *Client) request(ctx context.Context, method, path string, body io.Reader) (*http.Response, error) {
+	requestCtx, cancel := c.requestContext(ctx)
 	req, err := http.NewRequestWithContext(requestCtx, method, c.endpoint+path, body)
 	if err != nil {
 		cancel()
