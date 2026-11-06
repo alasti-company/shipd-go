@@ -13,7 +13,7 @@ const (
 	DefaultStreamEndpoint  = "https://ws.useshipd.com"
 	// DefaultEndpoint is the edge origin used unless Overrides.UnsafeEndpoint is set.
 	DefaultEndpoint = "https://edge.useshipd.com"
-	SDKVersion      = "0.1.0" // x-release-please-version
+	SDKVersion      = "0.2.0" // x-release-please-version
 	maxSafeVersion  = 9007199254740991
 )
 
