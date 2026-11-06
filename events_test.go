@@ -101,6 +101,9 @@ func TestEmptyFlushClearsLastError(t *testing.T) {
 			if err := c.Ready(ctx); err == nil || c.LastError() == nil {
 				t.Fatal("expected initial fetch failure")
 			}
+			c.mu.Lock()
+			c.events = nil
+			c.mu.Unlock() // This test exercises an empty flush after fetch diagnostics.
 			if err := c.Flush(ctx); err != nil {
 				t.Fatal(err)
 			}

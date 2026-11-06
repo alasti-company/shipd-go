@@ -45,6 +45,11 @@ func waitReady(t *testing.T, c *Client) {
 	if err := c.Ready(ctx); err != nil {
 		t.Fatal(err)
 	}
+	select {
+	case <-c.attempted:
+	case <-ctx.Done():
+		t.Fatal(ctx.Err())
+	}
 }
 func newTestClient(t *testing.T, handler http.HandlerFunc, options Options) (*Client, *httptest.Server) {
 	t.Helper()
@@ -212,8 +217,8 @@ func TestReturnedSnapshotVersionCannotMutateTelemetry(t *testing.T) {
 		t.Fatal(err)
 	}
 	events := <-posted
-	if len(events) != 3 {
-		t.Fatalf("got %d events, want two evaluations and an unregistered flag", len(events))
+	if len(events) != 4 {
+		t.Fatalf("got %d events, want fetch timing, two evaluations and an unregistered flag", len(events))
 	}
 	for _, event := range events {
 		if version := event["snapshotVersion"]; version != float64(9) {
@@ -280,8 +285,8 @@ func TestShutdownFlushesThenCloses(t *testing.T) {
 	if err := c.Shutdown(ctx); err != nil {
 		t.Fatal(err)
 	}
-	if delivered.Load() != 2 {
-		t.Fatalf("delivered %d events before close, want 2", delivered.Load())
+	if delivered.Load() != 3 {
+		t.Fatalf("delivered %d events before close, want 3", delivered.Load())
 	}
 	if !errors.Is(c.Refresh(ctx), ErrClosed) {
 		t.Fatal("client should be closed after Shutdown")
@@ -404,6 +409,10 @@ func TestEventRetryAndIdentify(t *testing.T) {
 	mu.Lock()
 	defer mu.Unlock()
 	events := batches[0]["events"].([]any)
+	if events[0].(map[string]any)["type"] != "timing" {
+		t.Fatal("missing snapshot timing")
+	}
+	events = events[1:]
 	if len(events) != 2 {
 		t.Fatalf("events lost: %v", events)
 	}
@@ -426,7 +435,7 @@ func TestEventBufferBound(t *testing.T) {
 	}
 	c.mu.RLock()
 	defer c.mu.RUnlock()
-	if len(c.events) != 200 || c.events[0]["userId"] != "50" || c.dropped != 50 {
+	if len(c.events) != 200 || c.events[0]["userId"] != "50" || c.dropped != 51 {
 		t.Fatal("buffer should retain latest 200 events and count drops")
 	}
 }
@@ -461,7 +470,7 @@ func TestSizeTriggeredFlush(t *testing.T) {
 	if err := c.Flush(context.Background()); err != nil {
 		t.Fatal(err)
 	}
-	if got := delivered.Load(); got != 1000 || c.DroppedEvents() != 0 {
+	if got := delivered.Load(); got != 1001 || c.DroppedEvents() != 0 {
 		t.Fatalf("delivered %d events, dropped %d", got, c.DroppedEvents())
 	}
 }
@@ -507,7 +516,7 @@ func TestSnapshotVersion(t *testing.T) {
 	}
 	c.mu.RLock()
 	defer c.mu.RUnlock()
-	if len(c.events) != 0 {
+	if len(c.events) != 1 || c.events[0]["type"] != "timing" {
 		t.Fatal("SnapshotVersion must not record events")
 	}
 }
@@ -681,7 +690,7 @@ func TestNegativeFlushIntervalDisablesTimedFlush(t *testing.T) {
 	}, Options{FlushAt: -1, FlushInterval: -1})
 	waitReady(t, c)
 	c.IsEnabled("new-checkout", EvaluationContext{})
-	if bufferedEvents(c) != 1 || posts.Load() != 0 {
+	if bufferedEvents(c) != 2 || posts.Load() != 0 {
 		t.Fatal("events should wait for an explicit flush")
 	}
 	if err := c.Flush(context.Background()); err != nil || posts.Load() != 1 {
@@ -722,7 +731,9 @@ func TestShutdownDeliversEventsRecordedDuringBackgroundFlush(t *testing.T) {
 		mu.Lock()
 		first := len(delivered) == 0
 		for _, e := range batch.Events {
-			delivered = append(delivered, fmt.Sprint(e["userId"]))
+			if e["type"] == "evaluation" {
+				delivered = append(delivered, fmt.Sprint(e["userId"]))
+			}
 		}
 		mu.Unlock()
 		if first {
@@ -764,7 +775,17 @@ func TestStringValuesAreBoundedByLength(t *testing.T) {
 	}
 	c.mu.RLock()
 	defer c.mu.RUnlock()
-	if _, ok := c.events[0]["value"]; ok || len(c.events) != 1 {
+	evaluations := 0
+	for _, event := range c.events {
+		if event["type"] != "evaluation" {
+			continue
+		}
+		evaluations++
+		if _, ok := event["value"]; ok {
+			t.Fatal("oversized evaluation value retained")
+		}
+	}
+	if evaluations != 1 {
 		t.Fatal("an oversized string value should be dropped from its event")
 	}
 }

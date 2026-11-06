@@ -1,10 +1,16 @@
 // Package shipd evaluates shipd flags locally using periodically refreshed snapshots.
 package shipd
 
-import "time"
+import (
+	"context"
+	"time"
+)
 
 const (
-	SnapshotSchemaVersion = 1
+	SnapshotSchemaVersion  = 1
+	StreamProtocolVersion  = 1
+	ControlPlaneAPIVersion = 1
+	DefaultStreamEndpoint  = "https://ws.useshipd.com"
 	// DefaultEndpoint is the edge origin used unless Overrides.UnsafeEndpoint is set.
 	DefaultEndpoint = "https://edge.useshipd.com"
 	SDKVersion      = "0.1.0" // x-release-please-version
@@ -25,12 +31,31 @@ type EvaluationContext struct {
 // Options configures one client per process. Zero durations select the defaults.
 // Set DisablePolling to fetch only the initial snapshot (or refresh manually).
 type Options struct {
-	SDKKey          string
-	Defaults        map[string]any
-	RefreshInterval time.Duration
-	FetchTimeout    time.Duration
-	DisablePolling  bool
-	DisableEvents   bool
+	// Context supplies defaults merged under each evaluation's context.
+	Context EvaluationContext
+	// Cache stores validated snapshots and ETags. Implementations must honor ctx.
+	Cache SnapshotCache
+	// OnError receives background errors. Callbacks must return promptly and must
+	// not call blocking lifecycle methods (Refresh, Flush, Shutdown, Close).
+	OnError func(error)
+	// Stream enables ticket-authenticated WebSocket invalidations; polling remains active.
+	Stream bool
+	// AnonymousID correlates evaluation events with an anonymous browser session.
+	AnonymousID string
+	// AutomaticTraits opts into location traits supplied by the edge, below explicit context.
+	AutomaticTraits    bool
+	AutomaticTraitSeed map[string]string
+	// DisableFetchTimeout allows requests to use only their caller/lifecycle deadline.
+	DisableFetchTimeout bool
+	SDKKey              string
+	Defaults            map[string]any
+	RefreshInterval     time.Duration
+	// ReadyTimeout bounds Ready even when its caller supplies no deadline (default
+	// 5 seconds). Negative returns immediately with defaults, like readyTimeoutMs: 0.
+	ReadyTimeout   time.Duration
+	FetchTimeout   time.Duration
+	DisablePolling bool
+	DisableEvents  bool
 	// FlushAt flushes events once this many are buffered (default 50, at most 200).
 	// A negative value flushes on FlushInterval only.
 	FlushAt int
@@ -50,6 +75,7 @@ type Options struct {
 
 // Overrides changes where the client connects.
 type Overrides struct {
+	StreamEndpoint string
 	// UnsafeEndpoint replaces the edge origin (https://edge.useshipd.com) that
 	// receives your SDK key. Unsafe: for shipd development and tests only.
 	UnsafeEndpoint string
@@ -114,4 +140,17 @@ type serve struct {
 type variation struct {
 	Weight float64 `json:"weight"`
 	Serve  serve   `json:"serve"`
+}
+
+// CachedSnapshot is the last valid wire snapshot and its HTTP entity tag.
+type CachedSnapshot struct {
+	Snapshot []byte
+	ETag     string
+}
+
+// SnapshotCache is a durable cache adapter. Clients validate loaded data before use.
+// Load may return nil when empty. Save receives a detached copy.
+type SnapshotCache interface {
+	Load(context.Context) (*CachedSnapshot, error)
+	Save(context.Context, CachedSnapshot) error
 }
