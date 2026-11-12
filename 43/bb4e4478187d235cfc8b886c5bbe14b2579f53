@@ -1,0 +1,19 @@
+scripts/generate-parity.mjs
+  s_57324fe67f5a07::t_773c38a1a6e835 3-16,19-22,24-29,31-49,51-54
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "43bb4e4478187d235cfc8b886c5bbe14b2579f53",
+  "prompts": {},
+  "sessions": {
+    "s_57324fe67f5a07": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1d104-dfa5-7e00-bacb-6eec0f273e0f",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Kourosh Alasti <coding@kouroshalasti.com>"
+    }
+  }
+}
