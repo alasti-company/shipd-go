@@ -1,0 +1,21 @@
+runtime_test.go
+  s_c46209da426965::t_42b7c16f2a3089 506-586
+PARITY.md
+  s_c46209da426965::t_42b7c16f2a3089 62-63
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "eafb8ea685abe541c8e051ea3d1131ddc7bf95b3",
+  "prompts": {},
+  "sessions": {
+    "s_c46209da426965": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1b03b-ce82-7ed2-b1b4-07588a5d53e4",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Kourosh Alasti <coding@kouroshalasti.com>"
+    }
+  }
+}

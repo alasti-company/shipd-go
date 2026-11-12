@@ -1,0 +1,52 @@
+events.go
+  s_c46209da426965::t_4b6309f6643ff8 218
+  s_c46209da426965::t_f611fc1b2750ed 30
+  s_c46209da426965::t_1fcdc85291c7ac 16-19,31,60-62,147-151
+  s_c46209da426965::t_7ed6651bb6e9e7 207-217,226
+go.mod
+  s_c46209da426965::t_1172ed3627a0cf 4
+  s_c46209da426965::t_4b6309f6643ff8 5
+runtime.go
+  s_c46209da426965::t_25fd28c968ecdb 110
+  s_c46209da426965::t_1fcdc85291c7ac 1-5,7-28,30-34,45-109,111-197,200-204,206-210,232,234-271,273,280-293
+  s_c46209da426965::t_7ed6651bb6e9e7 6,29,35-44,198-199,205,211-231,233
+  s_c46209da426965::t_19790c8e622fdf 272,274-279
+scripts/generate-parity.mjs
+  s_c46209da426965::t_4b6309f6643ff8 1-3,5-7,10-18,20
+  s_c46209da426965::t_9876587cd4e5a2 4,8-9,19
+types.go
+  s_c46209da426965::t_f611fc1b2750ed 34,144-146,149-153
+  s_c46209da426965::t_1fcdc85291c7ac 4-7,10-13,35-58,78,147-148,154-155
+client.go
+  s_c46209da426965::t_1fcdc85291c7ac 5-6,57-61,108-117,146,149-154,171,255-258,269-275,315-321,368-371,377-380,388-393,495
+  s_c46209da426965::t_4b6309f6643ff8 70-72
+  s_c46209da426965::t_f611fc1b2750ed 107,131,254,279,314,358
+events_test.go
+  s_c46209da426965::t_19790c8e622fdf 104-106
+client_test.go
+  s_c46209da426965::t_19790c8e622fdf 48-52,220-221,288-289,412-415,438,473,519,693,734-736
+  s_c46209da426965::t_9876587cd4e5a2 778-788
+stream.go
+  s_c46209da426965::t_1fcdc85291c7ac 1-267
+go.sum
+  ai_agent 1-2
+runtime_test.go
+  s_c46209da426965::t_7065f9204cd3c2 1-3,6-25,27-42,49-300
+  s_c46209da426965::t_9876587cd4e5a2 4-5,26,43-48
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "aba45e9a6cacd8ff2e6c49a74967bfbf0336b91f",
+  "prompts": {},
+  "sessions": {
+    "s_c46209da426965": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1b03b-ce82-7ed2-b1b4-07588a5d53e4",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Kourosh Alasti <coding@kouroshalasti.com>"
+    }
+  }
+}
