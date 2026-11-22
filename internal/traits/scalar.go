@@ -19,7 +19,7 @@ func NormalizeScalar(value any) (any, bool) {
 		return v.Bool(), true
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		return float64(v.Int()), true
-	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
 		return float64(v.Uint()), true
 	case reflect.Float32, reflect.Float64:
 		n := v.Float()

@@ -96,7 +96,7 @@ func TestResolutionThroughOpenFeature(t *testing.T) {
 
 	ctx := context.Background()
 	client := of.NewClient("checkout")
-	of.SetEvaluationContext(of.NewEvaluationContext("global-user", map[string]any{"plan": "free", "score": int32(10)}))
+	of.SetEvaluationContext(of.NewEvaluationContext("global-user", map[string]any{"plan": "free", "score": uintptr(10)}))
 	client.SetEvaluationContext(of.NewEvaluationContext("client-user", map[string]any{"employee": false}))
 	user := of.NewEvaluationContext("user-1", map[string]any{"plan": "pro", "nullable": nil})
 

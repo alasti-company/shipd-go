@@ -113,6 +113,8 @@ func closedError() error {
 
 // EventChannel reports readiness after recovery and accepted snapshot version
 // changes. OpenFeature emits the initial readiness or error event from Init.
+// The channel stays open on shutdown because OpenFeature Go v1.15.1 keeps
+// reading a closed channel until its provider listener is removed.
 func (p *Provider) EventChannel() <-chan of.Event { return p.events }
 
 func (p *Provider) snapshotChanged() {
