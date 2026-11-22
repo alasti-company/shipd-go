@@ -364,8 +364,17 @@ func (c *Client) Refresh(ctx context.Context) (err error) {
 
 // Evaluate returns details and records a bounded diagnostic event including
 // the user ID and up to 100 scalar traits. DisableEvents suppresses telemetry.
-func (c *Client) Evaluate(key string, ctx EvaluationContext) Result { return c.evaluate(key, ctx, nil) }
-func (c *Client) evaluate(key string, ctx EvaluationContext, fallback any) Result {
+func (c *Client) Evaluate(key string, ctx EvaluationContext) Result {
+	return c.EvaluateDetails(key, ctx).Result
+}
+
+// EvaluateDetails evaluates and records diagnostics like Evaluate. It also
+// reports the flag type from the same snapshot as the value.
+func (c *Client) EvaluateDetails(key string, ctx EvaluationContext) EvaluationDetails {
+	return c.evaluate(key, ctx, nil)
+}
+
+func (c *Client) evaluate(key string, ctx EvaluationContext, fallback any) EvaluationDetails {
 	c.mu.RLock()
 	s := c.snapshot
 	ctx = mergeContext(c.options.Context, ctx)

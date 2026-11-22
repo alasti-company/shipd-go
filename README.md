@@ -57,6 +57,73 @@ func main() {
 }
 ```
 
+## OpenFeature
+
+Install the provider in an application that uses the OpenFeature Go SDK:
+
+```sh
+go get github.com/alasti-company/shipd-go/openfeature
+```
+
+Register it with a server SDK key (`shipd_sdk_server_…`) and use your existing
+OpenFeature client. The minimum versions are Go 1.23 and OpenFeature Go SDK
+v1.15.1.
+
+```go
+import (
+    "os"
+
+    shipd "github.com/alasti-company/shipd-go"
+    shipdof "github.com/alasti-company/shipd-go/openfeature"
+    "github.com/open-feature/go-sdk/openfeature"
+)
+
+// At startup
+defer openfeature.Shutdown()
+if err := openfeature.SetProviderAndWait(shipdof.NewProvider(shipd.Options{
+    SDKKey: os.Getenv("SHIPD_SDK_KEY"),
+})); err != nil {
+    return err
+}
+client := openfeature.NewClient("checkout")
+
+// Per request
+user := openfeature.NewEvaluationContext("usr_8f2k19", map[string]any{"plan": "pro"})
+enabled, err := client.BooleanValue(ctx, "new-checkout", false, user)
+```
+
+For a complete example, set `SHIPD_SDK_KEY` for an environment with
+`new-checkout` (boolean), `search-variant` (variant), `max-retries` (number),
+and `checkout-payload` (JSON), then run `go run ./examples/openfeature`
+from this checkout. Missing flags use the defaults from the example.
+
+- `targetingKey` maps to Shipd's user ID. Other OpenFeature context attributes
+  become Shipd targeting traits and can be strings, booleans, finite numbers,
+  or nil. `userId` is reserved. Nested attributes and other unsupported values
+  return `INVALID_CONTEXT`. Snapshot-defined audiences still work.
+- Use `Boolean`, `String`, `Float` or `Int`, and `Object` for boolean, variant,
+  number, and JSON flags. JSON flags can serve objects, arrays, primitives, or
+  null. `Int` requires a whole number in the `int64` range after the SDK's
+  `float64` decoding.
+- Missing flags and incompatible types return the caller's default with
+  `FLAG_NOT_FOUND` or `TYPE_MISMATCH`. Disabled flags use the snapshot's
+  configured default. Successful details report `TARGETING_MATCH`, `DEFAULT`,
+  or `DISABLED`, with `snapshotVersion` and an optional `ruleId` in flag metadata.
+- The provider owns its Shipd client and uses the SDK's polling, optional
+  streaming, bootstrap, cache, and diagnostic options. OpenFeature supplies
+  context and defaults, so the provider ignores Shipd's `Defaults`, `Context`,
+  `AutomaticTraits`, and `AutomaticTraitSeed` options.
+- Initial loading requires a usable snapshot, including one loaded from
+  bootstrap or cache. Polling or streaming can recover after startup failure
+  and emit `PROVIDER_READY`. With OpenFeature Go v1.15.1, use asynchronous
+  `SetProvider` to receive recovery events after an initialization failure.
+  `SetProviderAndWait` returns the error before that SDK attaches its listener.
+  Accepted snapshot version changes emit `PROVIDER_CONFIGURATION_CHANGED`.
+  Refresh failures retain the last valid snapshot.
+- Call `openfeature.Shutdown()` at application shutdown. The provider stops
+  updates and gives pending diagnostics up to five seconds to flush. Use a new
+  provider if you register Shipd again.
+
 ## Behavior
 
 - Initial asynchronous `GET /sdk/v1/snapshot`; polls every 30 seconds using ETags.

@@ -90,6 +90,12 @@ type Result struct {
 	SnapshotVersion *int64
 }
 
+// EvaluationDetails adds the flag's declared type to a local evaluation.
+type EvaluationDetails struct {
+	Result
+	FlagType string // Empty if no snapshot or flag was found.
+}
+
 type snapshot struct {
 	SchemaVersion  int                `json:"schemaVersion"`
 	ProjectID      string             `json:"projectId"`
