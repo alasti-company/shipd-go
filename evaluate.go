@@ -330,8 +330,8 @@ func resolve(s serve, key string, ctx EvaluationContext) serve {
 	}
 	return s.Variations[len(s.Variations)-1].Serve
 }
-func evaluate(s *snapshot, key string, ctx EvaluationContext, fallback any) Result {
-	r := Result{Key: key, Value: fallback, Reason: "no_snapshot"}
+func evaluate(s *snapshot, key string, ctx EvaluationContext, fallback any) EvaluationDetails {
+	r := EvaluationDetails{Result: Result{Key: key, Value: fallback, Reason: "no_snapshot"}}
 	if s == nil {
 		return r
 	}
@@ -342,6 +342,7 @@ func evaluate(s *snapshot, key string, ctx EvaluationContext, fallback any) Resu
 		r.Reason = "not_found"
 		return r
 	}
+	r.FlagType = f.Type
 	r.Value = f.Default
 	if !f.Enabled {
 		r.Reason = "flag_disabled"

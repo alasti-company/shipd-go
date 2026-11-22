@@ -3,7 +3,6 @@ package shipd
 import (
 	"context"
 	"fmt"
-	"math"
 	"net/url"
 	"reflect"
 	"sort"
@@ -11,6 +10,8 @@ import (
 	"sync"
 	"time"
 	_ "time/tzdata" // Keep automatic timezone traits valid in minimal containers.
+
+	"github.com/alasti-company/shipd-go/internal/traits"
 )
 
 func copyContext(ctx EvaluationContext) EvaluationContext {
@@ -196,7 +197,7 @@ func telemetryTraits(attrs map[string]any) map[string]any {
 	sort.Strings(keys)
 	result := map[string]any{}
 	for _, k := range keys {
-		v, valid := telemetryTrait(attrs[k])
+		v, valid := traits.NormalizeScalar(attrs[k])
 		if !boundedString(k, 128, true) || !valid {
 			continue
 		}
@@ -210,28 +211,6 @@ func telemetryTraits(attrs map[string]any) map[string]any {
 	}
 	return result
 }
-func telemetryTrait(value any) (any, bool) {
-	if value == nil {
-		return nil, true
-	}
-	v := reflect.ValueOf(value)
-	switch v.Kind() {
-	case reflect.String:
-		return v.String(), true
-	case reflect.Bool:
-		return v.Bool(), true
-	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		return float64(v.Int()), true
-	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-		return float64(v.Uint()), true
-	case reflect.Float32, reflect.Float64:
-		n := v.Float()
-		return n, !math.IsNaN(n) && !math.IsInf(n, 0)
-	default:
-		return nil, false
-	}
-}
-
 func automaticTraits(seed map[string]string) map[string]any {
 	result := map[string]any{}
 	for _, k := range []string{"country", "region", "city", "timezone"} {
