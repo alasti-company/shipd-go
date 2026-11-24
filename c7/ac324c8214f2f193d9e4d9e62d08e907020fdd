@@ -1,0 +1,31 @@
+snapshot_signature_test.go
+  s_b8b4ea863c9ff2::t_099e9069f92f0e 4,11,13,38-127
+types.go
+  s_b8b4ea863c9ff2::t_099e9069f92f0e 153-160,162-164
+snapshot_signature.go
+  s_b8b4ea863c9ff2::t_099e9069f92f0e 37-53
+client.go
+  s_b8b4ea863c9ff2::t_099e9069f92f0e 108-114,373
+config/config.go
+  s_b8b4ea863c9ff2::t_099e9069f92f0e 81-85,90
+config/rollout_test.go
+  s_b8b4ea863c9ff2::t_099e9069f92f0e 29-57
+runtime.go
+  s_b8b4ea863c9ff2::t_099e9069f92f0e 151-156,162,164,189-194
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "c7ac324c8214f2f193d9e4d9e62d08e907020fdd",
+  "prompts": {},
+  "sessions": {
+    "s_b8b4ea863c9ff2": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a20c2b-7741-7033-87db-8c74e8d7872b",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Kourosh Alasti <coding@kouroshalasti.com>"
+    }
+  }
+}
