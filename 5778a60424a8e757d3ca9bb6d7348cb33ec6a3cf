@@ -1,0 +1,29 @@
+client_test.go
+  s_c46209da426965::t_eddeabd1aba9d1 520
+runtime.go
+  s_c46209da426965::t_eddeabd1aba9d1 168
+client.go
+  s_c46209da426965::t_eddeabd1aba9d1 253-255,257-261
+events.go
+  s_c46209da426965::t_eddeabd1aba9d1 11,207-214,216-224,227-239,244,246
+scripts/generate-parity.mjs
+  s_c46209da426965::t_eddeabd1aba9d1 10-13
+stream.go
+  s_c46209da426965::t_eddeabd1aba9d1 83-97,111-112,187
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "5778a60424a8e757d3ca9bb6d7348cb33ec6a3cf",
+  "prompts": {},
+  "sessions": {
+    "s_c46209da426965": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1b03b-ce82-7ed2-b1b4-07588a5d53e4",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Kourosh Alasti <coding@kouroshalasti.com>"
+    }
+  }
+}
