@@ -9,6 +9,7 @@ import (
 	"crypto/x509"
 	"encoding/base64"
 	"encoding/pem"
+	"errors"
 	"net/http"
 	"sync/atomic"
 	"testing"
@@ -180,5 +181,13 @@ func TestNewRejectsInvalidSnapshotKeys(t *testing.T) {
 			c.Close()
 			t.Fatal("accepted invalid verification key configuration")
 		}
+	}
+}
+
+func TestSnapshotKeyParseErrorPreservesCause(t *testing.T) {
+	malformed := string(pem.EncodeToMemory(&pem.Block{Type: "PUBLIC KEY", Bytes: []byte{1, 2, 3}}))
+	_, err := New(Options{SDKKey: "shipd_sdk_server_test", SnapshotVerificationKeys: map[string]string{"test": malformed}})
+	if err == nil || errors.Unwrap(err) == nil {
+		t.Fatalf("missing key parse cause: %v", err)
 	}
 }

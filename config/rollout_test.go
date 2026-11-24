@@ -84,3 +84,18 @@ func TestRolloutNamesAndReadableErrors(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestWeightedRolloutTreatmentTraits(t *testing.T) {
+	flag := FlagDefinition{Type: "boolean", Default: false, Traits: map[string]TraitDefinition{"plan": {Type: "string"}}, Targeting: &Targeting{Enabled: true, Fallthrough: Serve{Kind: "boolean", Value: false}}, Rollout: &Rollout{Provider: "sentry", Connection: "prod", Treatment: Serve{Kind: "weighted", Attribute: "plan", Variations: []WeightedVariation{{Weight: 1, Serve: Serve{Kind: "boolean", Value: true}}, {Weight: 1, Serve: Serve{Kind: "boolean", Value: false}}}}, Steps: []RolloutStep{{Percentage: 100, MinDwellSeconds: 60}}, Guards: []RolloutGuard{{Metric: "error_rate", Threshold: .01}}}}
+	c := ShipdConfig{"checkout": flag}
+	if err := c.Validate(); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := json.Marshal(c); err != nil {
+		t.Fatal(err)
+	}
+	flag.Rollout.Treatment.Attribute = "undeclared"
+	if err := c.Validate(); err == nil {
+		t.Fatal("accepted undeclared treatment bucketing trait")
+	}
+}

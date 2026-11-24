@@ -25,7 +25,7 @@ func parseSnapshotVerificationKeys(keys map[string]string) (snapshotVerification
 		}
 		public, err := x509.ParsePKIXPublicKey(block.Bytes)
 		if err != nil {
-			return nil, fmt.Errorf("shipd: invalid snapshot verification key %q", id)
+			return nil, fmt.Errorf("shipd: invalid snapshot verification key %q: %w", id, err)
 		}
 		key, ok := public.(ed25519.PublicKey)
 		if !ok {
