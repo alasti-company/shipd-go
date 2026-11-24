@@ -148,14 +148,20 @@ func (c *Client) loadCache() {
 	if cached == nil || c.ctx.Err() != nil {
 		return
 	}
+	if c.options.SnapshotVerificationKeys != nil {
+		if err := verifySnapshotSignature(cached.Snapshot, snapshotSignatureHeaders(cached.Signature), c.options.SnapshotVerificationKeys); err != nil {
+			c.reportError(fmt.Errorf("shipd: cache load: %w", err), true)
+			return
+		}
+	}
 	s, err := parseSnapshot(cached.Snapshot)
 	if err != nil {
 		c.reportError(fmt.Errorf("shipd: cache load: %w", err), true)
 		return
 	}
-	c.applySnapshot(s, cached.Snapshot, cached.ETag, c.ctx, false)
+	c.applySnapshot(s, cached.Snapshot, cached.ETag, c.ctx, false, cached.Signature)
 }
-func (c *Client) applySnapshot(next *snapshot, data []byte, etag string, ctx context.Context, persist bool) {
+func (c *Client) applySnapshot(next *snapshot, data []byte, etag string, ctx context.Context, persist bool, signature *SnapshotSignature) {
 	c.mu.Lock()
 	if c.closed || (c.snapshot != nil && next.Version < c.snapshot.Version) {
 		c.mu.Unlock()
@@ -180,7 +186,12 @@ func (c *Client) applySnapshot(next *snapshot, data []byte, etag string, ctx con
 		c.record(map[string]any{"type": "version_skew", "previousVersion": *previous, "currentVersion": next.Version})
 	}
 	if persist && c.options.Cache != nil {
-		if err := c.options.Cache.Save(ctx, CachedSnapshot{Snapshot: append([]byte(nil), data...), ETag: savedETag}); err != nil {
+		var proof *SnapshotSignature
+		if signature != nil {
+			detached := *signature
+			proof = &detached
+		}
+		if err := c.options.Cache.Save(ctx, CachedSnapshot{Snapshot: append([]byte(nil), data...), ETag: savedETag, Signature: proof}); err != nil {
 			c.reportError(fmt.Errorf("shipd: cache save: %w", err), true)
 		}
 	}

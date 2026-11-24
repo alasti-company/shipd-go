@@ -78,20 +78,20 @@ func (c ShipdConfig) normalized() (map[string]map[string]any, error) {
 		if definition.Traits != nil {
 			f["traits"] = definition.Traits
 		}
+		var normalized FlagDefinition
+		if err := json.Unmarshal(encoded, &normalized); err != nil {
+			return nil, err
+		}
+		normalized.Traits = definition.Traits
 		if definition.Rollout != nil {
 			if definition.Targeting == nil {
 				return nil, fmt.Errorf("shipd: flag %q rollout requires code-owned targeting", key)
 			}
-			if err := definition.Rollout.validate(definition); err != nil {
+			if err := normalized.Rollout.validate(normalized); err != nil {
 				return nil, fmt.Errorf("shipd: flag %q rollout: %w", key, err)
 			}
 		}
 		if definition.Targeting != nil {
-			var normalized FlagDefinition
-			if err := json.Unmarshal(encoded, &normalized); err != nil {
-				return nil, err
-			}
-			normalized.Traits = definition.Traits
 			if err := normalized.Targeting.validate(normalized); err != nil {
 				return nil, fmt.Errorf("shipd: flag %q targeting: %w", key, err)
 			}

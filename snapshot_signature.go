@@ -34,3 +34,20 @@ func verifySnapshotSignature(body []byte, headers http.Header, keys map[string]s
 	}
 	return nil
 }
+
+func snapshotSignatureFromHeaders(headers http.Header) *SnapshotSignature {
+	keyID, value := headers.Get("X-Shipd-Snapshot-Key-Id"), headers.Get("X-Shipd-Snapshot-Signature")
+	if keyID == "" || value == "" {
+		return nil
+	}
+	return &SnapshotSignature{KeyID: keyID, Value: value}
+}
+
+func snapshotSignatureHeaders(signature *SnapshotSignature) http.Header {
+	headers := http.Header{}
+	if signature != nil {
+		headers.Set("X-Shipd-Snapshot-Key-Id", signature.KeyID)
+		headers.Set("X-Shipd-Snapshot-Signature", signature.Value)
+	}
+	return headers
+}

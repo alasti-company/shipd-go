@@ -150,10 +150,18 @@ type variation struct {
 	Serve  serve   `json:"serve"`
 }
 
-// CachedSnapshot is the last valid wire snapshot and its HTTP entity tag.
+// SnapshotSignature is the detached Ed25519 proof for exact wire snapshot bytes.
+type SnapshotSignature struct {
+	KeyID string
+	Value string
+}
+
+// CachedSnapshot is the last valid wire snapshot, its entity tag, and signing proof.
+// Cache adapters must persist Signature when verification keys are configured.
 type CachedSnapshot struct {
-	Snapshot []byte
-	ETag     string
+	Snapshot  []byte
+	ETag      string
+	Signature *SnapshotSignature
 }
 
 // SnapshotCache is a durable cache adapter. Clients validate loaded data before use.

@@ -105,6 +105,13 @@ func New(options Options) (*Client, error) {
 		options.FetchTimeout = 10 * time.Second
 	}
 	options.Context = copyContext(options.Context)
+	if options.SnapshotVerificationKeys != nil {
+		keys := make(map[string]string, len(options.SnapshotVerificationKeys))
+		for id, key := range options.SnapshotVerificationKeys {
+			keys[id] = key
+		}
+		options.SnapshotVerificationKeys = keys
+	}
 	seed := make(map[string]string, len(options.AutomaticTraitSeed))
 	for k, v := range options.AutomaticTraitSeed {
 		seed[k] = v
@@ -363,7 +370,7 @@ func (c *Client) Refresh(ctx context.Context) (err error) {
 		return err
 	}
 	c.applyAutomaticHeader(response.Header.Get("X-Shipd-Auto-Traits"))
-	c.applySnapshot(next, data, response.Header.Get("ETag"), fetchCtx, true)
+	c.applySnapshot(next, data, response.Header.Get("ETag"), fetchCtx, true, snapshotSignatureFromHeaders(response.Header))
 	return nil
 }
 
