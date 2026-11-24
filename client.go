@@ -28,14 +28,15 @@ var ErrClosed = errors.New("shipd: client is closed")
 
 // Client is safe for concurrent use. Keep one client per environment per process.
 type Client struct {
-	options   Options
-	endpoint  string
-	http      HTTPClient
-	ctx       context.Context
-	cancel    context.CancelFunc
-	done      chan struct{}
-	ready     chan struct{}
-	readyOnce sync.Once
+	options          Options
+	verificationKeys snapshotVerificationKeys
+	endpoint         string
+	http             HTTPClient
+	ctx              context.Context
+	cancel           context.CancelFunc
+	done             chan struct{}
+	ready            chan struct{}
+	readyOnce        sync.Once
 	// attempted closes after the first fetch attempt; attemptErr is its result.
 	attempted  chan struct{}
 	attemptErr error
@@ -104,6 +105,10 @@ func New(options Options) (*Client, error) {
 	if options.FetchTimeout == 0 {
 		options.FetchTimeout = 10 * time.Second
 	}
+	verificationKeys, err := parseSnapshotVerificationKeys(options.SnapshotVerificationKeys)
+	if err != nil {
+		return nil, err
+	}
 	options.Context = copyContext(options.Context)
 	if options.SnapshotVerificationKeys != nil {
 		keys := make(map[string]string, len(options.SnapshotVerificationKeys))
@@ -135,7 +140,7 @@ func New(options Options) (*Client, error) {
 		transport = &http.Client{CheckRedirect: func(_ *http.Request, _ []*http.Request) error { return http.ErrUseLastResponse }}
 	}
 	ctx, cancel := context.WithCancel(context.Background())
-	c := &Client{options: options, endpoint: endpoint, http: transport, ctx: ctx, cancel: cancel, done: make(chan struct{}), ready: make(chan struct{}), attempted: make(chan struct{}), flushNow: make(chan struct{}, 1), flushGate: make(chan struct{}, 1), listeners: make(map[uint64]func()), streamDone: make(chan struct{}), automatic: automaticTraits(options.AutomaticTraitSeed)}
+	c := &Client{options: options, verificationKeys: verificationKeys, endpoint: endpoint, http: transport, ctx: ctx, cancel: cancel, done: make(chan struct{}), ready: make(chan struct{}), attempted: make(chan struct{}), flushNow: make(chan struct{}, 1), flushGate: make(chan struct{}, 1), listeners: make(map[uint64]func()), streamDone: make(chan struct{}), automatic: automaticTraits(options.AutomaticTraitSeed)}
 	if options.Bootstrap != nil {
 		bootstrap, err := parseSnapshot(options.Bootstrap)
 		if err != nil {
@@ -361,7 +366,7 @@ func (c *Client) Refresh(ctx context.Context) (err error) {
 		return errors.New("shipd: snapshot exceeds 8 MiB")
 	}
 	if c.options.SnapshotVerificationKeys != nil {
-		if err := verifySnapshotSignature(data, response.Header, c.options.SnapshotVerificationKeys); err != nil {
+		if err := verifySnapshotWithKeys(data, response.Header, c.verificationKeys); err != nil {
 			return err
 		}
 	}

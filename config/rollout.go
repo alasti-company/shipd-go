@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"math"
+	"strings"
 )
 
 // Rollout defines the control-plane scheduler. SDK evaluation remains local.
@@ -27,28 +28,56 @@ type RolloutGuard struct {
 }
 
 func (r Rollout) validate(flag FlagDefinition) error {
-	if r.Provider != "sentry" || r.Connection == "" {
-		return fmt.Errorf("provider must be sentry with a connection name")
+	if r.Provider != "sentry" {
+		return fmt.Errorf("provider must be sentry")
 	}
-	if err := validateServe(r.Treatment, flag, false); err != nil {
-		return err
+	if strings.TrimSpace(r.Connection) == "" {
+		return fmt.Errorf("connection must contain a non-whitespace name")
 	}
-	if len(r.Steps) < 1 || len(r.Steps) > 20 || r.Steps[len(r.Steps)-1].Percentage != 100 {
-		return fmt.Errorf("steps must end at 100%% (1-20 steps)")
+	treatment := Targeting{Fallthrough: r.Treatment}
+	if err := treatment.validate(flag); err != nil {
+		return fmt.Errorf("treatment: %w", err)
+	}
+	if len(r.Steps) < 1 || len(r.Steps) > 20 {
+		return fmt.Errorf("steps must contain 1-20 entries")
 	}
 	last := 0.0
 	for i, step := range r.Steps {
-		if math.IsNaN(step.Percentage) || math.IsInf(step.Percentage, 0) || step.Percentage < .01 || step.Percentage > 100 || step.Percentage <= last || step.MinDwellSeconds < 1 || step.MinDwellSeconds > 604800 {
-			return fmt.Errorf("invalid steps[%d]: increasing percentage and positive dwell required", i)
+		if math.IsNaN(step.Percentage) || math.IsInf(step.Percentage, 0) || step.Percentage < .01 || step.Percentage > 100 {
+			return fmt.Errorf("steps[%d].percentage must be finite and between 0.01 and 100", i)
+		}
+		if step.Percentage <= last {
+			return fmt.Errorf("steps[%d].percentage must strictly increase", i)
+		}
+		if step.MinDwellSeconds < 1 || step.MinDwellSeconds > 604800 {
+			return fmt.Errorf("steps[%d].minDwellSeconds must be between 1 and 604800", i)
 		}
 		last = step.Percentage
 	}
+	if last != 100 {
+		return fmt.Errorf("last rollout step must be 100%%")
+	}
 	if len(r.Guards) < 1 || len(r.Guards) > 20 {
-		return fmt.Errorf("1-20 guards required")
+		return fmt.Errorf("guards must contain 1-20 entries")
 	}
 	for i, g := range r.Guards {
-		if (g.Metric != "error_rate" && g.Metric != "p95_latency" && g.Metric != "custom") || (g.Metric == "custom" && g.Field == "") || math.IsNaN(g.Threshold) || math.IsInf(g.Threshold, 0) || g.Threshold < 0 || (g.Metric == "error_rate" && g.Threshold > 1) || (g.Operator != "" && g.Operator != "lte" && g.Operator != "gte") || g.MinSamples < 0 {
-			return fmt.Errorf("invalid guards[%d]", i)
+		if g.Metric != "error_rate" && g.Metric != "p95_latency" && g.Metric != "custom" {
+			return fmt.Errorf("guards[%d].metric must be error_rate, p95_latency or custom", i)
+		}
+		if g.Metric == "custom" && strings.TrimSpace(g.Field) == "" {
+			return fmt.Errorf("guards[%d].field is required for custom metrics", i)
+		}
+		if math.IsNaN(g.Threshold) || math.IsInf(g.Threshold, 0) || g.Threshold < 0 {
+			return fmt.Errorf("guards[%d].threshold must be finite and nonnegative", i)
+		}
+		if g.Metric == "error_rate" && g.Threshold > 1 {
+			return fmt.Errorf("guards[%d].threshold must be between 0 and 1 for error_rate", i)
+		}
+		if g.Operator != "" && g.Operator != "lte" && g.Operator != "gte" {
+			return fmt.Errorf("guards[%d].operator must be lte or gte", i)
+		}
+		if g.MinSamples < 0 {
+			return fmt.Errorf("guards[%d].minSamples must be positive (or omitted for the default)", i)
 		}
 	}
 	return nil

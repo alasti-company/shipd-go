@@ -149,7 +149,7 @@ func (c *Client) loadCache() {
 		return
 	}
 	if c.options.SnapshotVerificationKeys != nil {
-		if err := verifySnapshotSignature(cached.Snapshot, snapshotSignatureHeaders(cached.Signature), c.options.SnapshotVerificationKeys); err != nil {
+		if err := verifySnapshotWithKeys(cached.Snapshot, snapshotSignatureHeaders(cached.Signature), c.verificationKeys); err != nil {
 			c.reportError(fmt.Errorf("shipd: cache load: %w", err), true)
 			return
 		}

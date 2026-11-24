@@ -105,7 +105,7 @@ func (c ShipdConfig) normalized() (map[string]map[string]any, error) {
 				}
 			}
 			for environment, override := range normalized.Targeting.Environments {
-				if strings.TrimSpace(environment) == "" || override == nil {
+				if strings.TrimSpace(environment) == "" || environment == "__proto__" || override == nil {
 					return nil, fmt.Errorf("shipd: flag %q invalid targeting environment %q", key, environment)
 				}
 				if len(override.Environments) != 0 {

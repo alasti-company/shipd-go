@@ -15,6 +15,9 @@ func TestRolloutAndEnvironmentOverrides(t *testing.T) {
 	if !strings.Contains(string(encoded), `"environments":{"staging"`) || !strings.Contains(string(encoded), `"rollout"`) {
 		t.Fatal(string(encoded))
 	}
+	if err := c.Validate(); err != nil {
+		t.Fatal(err)
+	}
 	f := c["checkout"]
 	f.Rollout.Steps[1].Percentage = 1
 	if err := c.Validate(); err == nil {
@@ -53,5 +56,31 @@ func TestNumericRolloutTreatmentNormalization(t *testing.T) {
 				t.Fatal("accepted invalid treatment in Defaults")
 			}
 		})
+	}
+}
+
+func TestRolloutNamesAndReadableErrors(t *testing.T) {
+	flag := FlagDefinition{Type: "boolean", Default: false, Targeting: &Targeting{Fallthrough: Serve{Kind: "boolean", Value: false}}, Rollout: &Rollout{Provider: "sentry", Connection: "prod", Treatment: Serve{Kind: "boolean", Value: true}, Steps: []RolloutStep{{Percentage: 100, MinDwellSeconds: 60}}, Guards: []RolloutGuard{{Metric: "error_rate", Threshold: .01}}}}
+	c := ShipdConfig{"checkout": flag}
+	if err := c.Validate(); err != nil {
+		t.Fatal(err)
+	}
+	flag.Targeting.Environments = map[string]*Targeting{"__proto__": {Fallthrough: Serve{Kind: "boolean", Value: false}}}
+	if err := c.Validate(); err == nil {
+		t.Fatal("accepted reserved environment")
+	}
+	flag.Targeting.Environments = nil
+	flag.Rollout.Connection = "  "
+	if err := c.Validate(); err == nil || !strings.Contains(err.Error(), "connection") {
+		t.Fatal(err)
+	}
+	flag.Rollout.Connection = "prod"
+	flag.Rollout.Guards[0] = RolloutGuard{Metric: "custom", Field: "  "}
+	if err := c.Validate(); err == nil || !strings.Contains(err.Error(), "guards[0].field") {
+		t.Fatal(err)
+	}
+	flag.Rollout.Guards[0] = RolloutGuard{Metric: "error_rate", Threshold: 2}
+	if err := c.Validate(); err == nil || !strings.Contains(err.Error(), "threshold") {
+		t.Fatal(err)
 	}
 }
