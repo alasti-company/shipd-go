@@ -353,6 +353,11 @@ func (c *Client) Refresh(ctx context.Context) (err error) {
 	if len(data) > 8*1024*1024 {
 		return errors.New("shipd: snapshot exceeds 8 MiB")
 	}
+	if c.options.SnapshotVerificationKeys != nil {
+		if err := verifySnapshotSignature(data, response.Header, c.options.SnapshotVerificationKeys); err != nil {
+			return err
+		}
+	}
 	next, err := parseSnapshot(data)
 	if err != nil {
 		return err

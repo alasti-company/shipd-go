@@ -16,9 +16,10 @@ type TraitDefinition struct {
 // Targeting is the complete state for the CLI's selected environment.
 // A nil pointer leaves dashboard targeting untouched. An empty Rules slice clears rules.
 type Targeting struct {
-	Enabled     bool   `json:"enabled"`
-	Rules       []Rule `json:"rules"`
-	Fallthrough Serve  `json:"fallthrough"`
+	Environments map[string]*Targeting `json:"environments,omitempty"`
+	Enabled      bool                  `json:"enabled"`
+	Rules        []Rule                `json:"rules"`
+	Fallthrough  Serve                 `json:"fallthrough"`
 }
 
 // Rule IDs are stable within a flag. Rules are evaluated in slice order.

@@ -31,6 +31,8 @@ type EvaluationContext struct {
 // Options configures one client per process. Zero durations select the defaults.
 // Set DisablePolling to fetch only the initial snapshot (or refresh manually).
 type Options struct {
+	// SnapshotVerificationKeys pins key ids to PEM SPKI Ed25519 public keys on refresh.
+	SnapshotVerificationKeys map[string]string
 	// Context supplies defaults merged under each evaluation's context.
 	Context EvaluationContext
 	// Cache stores validated snapshots and ETags. Implementations must honor ctx.
