@@ -1,0 +1,25 @@
+config/targeting.go
+  s_b8b4ea863c9ff2::t_963b4a6b07c795 19-22
+config/config.go
+  s_b8b4ea863c9ff2::t_963b4a6b07c795 15,81-88,107-123
+config/rollout.go
+  s_b8b4ea863c9ff2::t_963b4a6b07c795 1-55
+config/rollout_test.go
+  s_b8b4ea863c9ff2::t_9a1aae0541e9d0 1-28
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "f7b7945778c9349a4b6ac789fb5d8197b0475428",
+  "prompts": {},
+  "sessions": {
+    "s_b8b4ea863c9ff2": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a20c2b-7741-7033-87db-8c74e8d7872b",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Kourosh Alasti <coding@kouroshalasti.com>"
+    }
+  }
+}
