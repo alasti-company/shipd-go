@@ -31,6 +31,8 @@ type EvaluationContext struct {
 // Options configures one client per process. Zero durations select the defaults.
 // Set DisablePolling to fetch only the initial snapshot (or refresh manually).
 type Options struct {
+	// SnapshotVerificationKeys pins key ids to PEM SPKI Ed25519 public keys on refresh.
+	SnapshotVerificationKeys map[string]string
 	// Context supplies defaults merged under each evaluation's context.
 	Context EvaluationContext
 	// Cache stores validated snapshots and ETags. Implementations must honor ctx.
@@ -148,10 +150,18 @@ type variation struct {
 	Serve  serve   `json:"serve"`
 }
 
-// CachedSnapshot is the last valid wire snapshot and its HTTP entity tag.
+// SnapshotSignature is the detached Ed25519 proof for exact wire snapshot bytes.
+type SnapshotSignature struct {
+	KeyID string
+	Value string
+}
+
+// CachedSnapshot is the last valid wire snapshot, its entity tag, and signing proof.
+// Cache adapters must persist Signature when verification keys are configured.
 type CachedSnapshot struct {
-	Snapshot []byte
-	ETag     string
+	Snapshot  []byte
+	ETag      string
+	Signature *SnapshotSignature
 }
 
 // SnapshotCache is a durable cache adapter. Clients validate loaded data before use.

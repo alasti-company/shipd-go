@@ -12,6 +12,7 @@ import (
 // environment. Optional Targeting controls the complete selected environment state.
 type FlagDefinition struct {
 	Traits      map[string]TraitDefinition `json:"traits,omitempty"`
+	Rollout     *Rollout                   `json:"rollout,omitempty"`
 	Targeting   *Targeting                 `json:"targeting,omitempty"`
 	Type        string                     `json:"type"`
 	Default     any                        `json:"default"`
@@ -77,12 +78,20 @@ func (c ShipdConfig) normalized() (map[string]map[string]any, error) {
 		if definition.Traits != nil {
 			f["traits"] = definition.Traits
 		}
-		if definition.Targeting != nil {
-			var normalized FlagDefinition
-			if err := json.Unmarshal(encoded, &normalized); err != nil {
-				return nil, err
+		var normalized FlagDefinition
+		if err := json.Unmarshal(encoded, &normalized); err != nil {
+			return nil, err
+		}
+		normalized.Traits = definition.Traits
+		if definition.Rollout != nil {
+			if definition.Targeting == nil {
+				return nil, fmt.Errorf("shipd: flag %q rollout requires code-owned targeting", key)
 			}
-			normalized.Traits = definition.Traits
+			if err := normalized.Rollout.validate(normalized); err != nil {
+				return nil, fmt.Errorf("shipd: flag %q rollout: %w", key, err)
+			}
+		}
+		if definition.Targeting != nil {
 			if err := normalized.Targeting.validate(normalized); err != nil {
 				return nil, fmt.Errorf("shipd: flag %q targeting: %w", key, err)
 			}
@@ -93,6 +102,25 @@ func (c ShipdConfig) normalized() (map[string]map[string]any, error) {
 			for i := range normalized.Targeting.Rules {
 				if normalized.Targeting.Rules[i].Conditions == nil {
 					normalized.Targeting.Rules[i].Conditions = []Condition{}
+				}
+			}
+			for environment, override := range normalized.Targeting.Environments {
+				if strings.TrimSpace(environment) == "" || environment == "__proto__" || override == nil {
+					return nil, fmt.Errorf("shipd: flag %q invalid targeting environment %q", key, environment)
+				}
+				if len(override.Environments) != 0 {
+					return nil, fmt.Errorf("shipd: nested targeting environments are not supported")
+				}
+				if err := override.validate(normalized); err != nil {
+					return nil, fmt.Errorf("shipd: flag %q targeting.environments.%s: %w", key, environment, err)
+				}
+				if override.Rules == nil {
+					override.Rules = []Rule{}
+				}
+				for i := range override.Rules {
+					if override.Rules[i].Conditions == nil {
+						override.Rules[i].Conditions = []Condition{}
+					}
 				}
 			}
 			f["targeting"] = normalized.Targeting
