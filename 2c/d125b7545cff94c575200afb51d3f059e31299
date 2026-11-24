@@ -1,0 +1,23 @@
+snapshot_signature.go
+  s_b8b4ea863c9ff2::t_2f3a0ee97bd8c2 28
+config/rollout_test.go
+  s_b8b4ea863c9ff2::t_2f3a0ee97bd8c2 87-101
+snapshot_signature_test.go
+  s_b8b4ea863c9ff2::t_2f3a0ee97bd8c2 12,186-191
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "2cd125b7545cff94c575200afb51d3f059e31299",
+  "prompts": {},
+  "sessions": {
+    "s_b8b4ea863c9ff2": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a20c2b-7741-7033-87db-8c74e8d7872b",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Kourosh Alasti <coding@kouroshalasti.com>"
+    }
+  }
+}
